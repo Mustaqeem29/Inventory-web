@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Khuwaja Surgical</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dark-mode.css" id="dark-mode-css" disabled>
+</head>
+
+<body>
+
+  <!-- ===== DASHBOARD PAGE ===== -->
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon-sm">🏥</span>
+      <span>Khuwaja Surgical</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="nav-link active">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="inventory.html" class="nav-link">
+        <span class="nav-icon">📦</span> Inventory
+      </a>
+      <a href="billing.html" class="nav-link">
+        <span class="nav-icon">🧾</span> New Bill
+      </a>
+      <a href="bills.html" class="nav-link">
+        <span class="nav-icon">📋</span> Bills
+      </a>
+      <a href="settings.html" class="nav-link">
+        <span class="nav-icon">⚙️</span> Settings
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="login.html" class="nav-link logout-link">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Wrapper -->
+  <div class="main-wrapper">
+
+    <!-- Header -->
+    <header class="top-header">
+      <button class="menu-toggle" id="menu-toggle">☰</button>
+      <div class="header-title">Dashboard</div>
+      <div class="header-right">
+        <button class="dark-toggle" id="dark-toggle" title="Toggle Dark Mode">🌙</button>
+        <div class="user-badge">Admin</div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="page-content">
+
+      <div class="page-header">
+        <h2>Welcome, Admin 👋</h2>
+        <p class="page-date">Wednesday, 11 March 2026</p>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="cards-grid">
+
+        <div class="summary-card card-blue">
+          <div class="card-icon">📦</div>
+          <div class="card-info">
+            <span class="card-label">Total Items</span>
+            <span class="card-value">248</span>
+          </div>
+        </div>
+
+        <div class="summary-card card-red">
+          <div class="card-icon">⚠️</div>
+          <div class="card-info">
+            <span class="card-label">Low Stock Items</span>
+            <span class="card-value">12</span>
+          </div>
+        </div>
+
+        <div class="summary-card card-green">
+          <div class="card-icon">💰</div>
+          <div class="card-info">
+            <span class="card-label">Today's Sales</span>
+            <span class="card-value">Rs. 45,200</span>
+          </div>
+        </div>
+
+        <div class="summary-card card-purple">
+          <div class="card-icon">🧾</div>
+          <div class="card-info">
+            <span class="card-label">Total Bills</span>
+            <span class="card-value">1,340</span>
+          </div>
+        </div>
+
+      </div><!-- /.cards-grid -->
+
+      <!-- Quick Actions -->
+      <div class="section-block">
+        <h3 class="section-title">Quick Actions</h3>
+        <div class="quick-actions">
+          <a href="inventory.html" class="quick-btn qb-blue">
+            <span>➕</span> Add Item
+          </a>
+          <a href="billing.html" class="quick-btn qb-green">
+            <span>🧾</span> New Bill
+          </a>
+          <a href="bills.html" class="quick-btn qb-purple">
+            <span>📊</span> View Reports
+          </a>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="section-block">
+        <h3 class="section-title">Recent Bills</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Bill #</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>#1042</td>
+                <td>Rehman Medical</td>
+                <td>11 Mar 2026</td>
+                <td>Rs. 8,500</td>
+                <td><span class="badge badge-green">Paid</span></td>
+              </tr>
+              <tr>
+                <td>#1041</td>
+                <td>City Pharmacy</td>
+                <td>11 Mar 2026</td>
+                <td>Rs. 12,300</td>
+                <td><span class="badge badge-green">Paid</span></td>
+              </tr>
+              <tr>
+                <td>#1040</td>
+                <td>Khan Surgical</td>
+                <td>10 Mar 2026</td>
+                <td>Rs. 5,750</td>
+                <td><span class="badge badge-yellow">Pending</span></td>
+              </tr>
+              <tr>
+                <td>#1039</td>
+                <td>Al-Shifa Store</td>
+                <td>10 Mar 2026</td>
+                <td>Rs. 18,900</td>
+                <td><span class="badge badge-green">Paid</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Low Stock Alert -->
+      <div class="section-block">
+        <h3 class="section-title">⚠️ Low Stock Alert</h3>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Item Code</th>
+                <th>Item Name</th>
+                <th>Category</th>
+                <th>Stock Left</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>SRG-001</td>
+                <td>Surgical Gloves (M)</td>
+                <td>PPE</td>
+                <td><span class="badge badge-red">3 boxes</span></td>
+              </tr>
+              <tr>
+                <td>SRG-045</td>
+                <td>Disposable Syringe 5ml</td>
+                <td>Syringes</td>
+                <td><span class="badge badge-red">8 pcs</span></td>
+              </tr>
+              <tr>
+                <td>SRG-112</td>
+                <td>Bandage Roll 4"</td>
+                <td>Dressings</td>
+                <td><span class="badge badge-yellow">15 rolls</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main><!-- /.page-content -->
+  </div><!-- /.main-wrapper -->
+  <script src="js/db.js"></script>
+  <script src="js/helpers.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/backup.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('SW: Registered ✓'))
+        .catch(err => console.error('SW: Failed -', err));
+    }
+  </script>
+</body>
+
+</html>

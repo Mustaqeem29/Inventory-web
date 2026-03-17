@@ -1,0 +1,291 @@
+/* =====================================================
+   css/dark-mode.css
+   Khuwaja Surgical — Dark Mode Overrides
+   Apply by toggling this stylesheet or adding
+   class="dark" to <html>/<body>
+   ===================================================== */
+
+/* Override CSS variables for dark mode */
+:root {
+  --bg-body: #0f172a;
+  --bg-sidebar: #0d1520;
+  --bg-header: #1e293b;
+  --bg-card: #1e293b;
+  --bg-input: #0f172a;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-sidebar: #64748b;
+  --border: #334155;
+  --border-input: #475569;
+  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Body base */
+body {
+  background: var(--bg-body);
+  color: var(--text-primary);
+}
+
+/* Login page gradient — dark mode */
+.login-page {
+  background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+}
+
+.login-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+.login-brand p {
+  color: #64748b;
+}
+
+/* Auth tabs */
+.tab-btn {
+  color: #64748b;
+}
+
+.tab-btn.active {
+  color: #38bdf8;
+  border-bottom-color: #38bdf8;
+}
+
+/* Sidebar */
+.sidebar {
+  background: #0d1520;
+}
+
+.sidebar-brand {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-footer {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Top Header */
+.top-header {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+/* Cards */
+.summary-card {
+  background: #1e293b;
+  border-right-color: #334155;
+  border-top-color: #334155;
+  border-bottom-color: #334155;
+}
+
+/* Section blocks */
+.section-block {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.section-title {
+  border-bottom-color: #334155;
+}
+
+/* Tables */
+.data-table th {
+  background: #0f172a;
+  color: #64748b;
+  border-bottom-color: #334155;
+}
+
+.data-table td {
+  border-bottom-color: #334155;
+}
+
+.data-table tbody tr:hover {
+  background: rgba(14, 165, 233, 0.07);
+}
+
+/* Badges — dark mode tint adjustments */
+.badge-green {
+  background: #14532d;
+  color: #86efac;
+}
+
+.badge-red {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+.badge-yellow {
+  background: #78350f;
+  color: #fcd34d;
+}
+
+/* Inputs */
+.form-group input,
+.form-group select,
+.form-group textarea,
+.search-input,
+.filter-date,
+.discount-input {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-color: #475569;
+}
+
+.form-group input::placeholder,
+.search-input::placeholder {
+  color: #64748b;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus,
+.search-input:focus,
+.filter-date:focus {
+  border-color: #38bdf8;
+}
+
+/* Input icon wrap on login */
+.input-icon-wrap input {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-color: #475569;
+}
+
+.input-icon-wrap input:focus {
+  border-color: #38bdf8;
+}
+
+/* Buttons */
+.btn-outline {
+  color: #e2e8f0;
+  border-color: #475569;
+}
+
+.btn-outline:hover {
+  background: #0f172a;
+}
+
+.dark-toggle {
+  border-color: #475569;
+  color: #94a3b8;
+}
+
+.dark-toggle:hover {
+  background: #0f172a;
+  border-color: #38bdf8;
+}
+
+/* Quick buttons */
+.quick-btn {
+  filter: brightness(0.9);
+}
+
+.quick-btn:hover {
+  filter: brightness(1);
+}
+
+/* Invoice */
+.invoice-wrapper {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.invoice-header {
+  border-bottom-color: #334155;
+}
+
+.invoice-parties {
+  border-bottom-color: #334155;
+}
+
+.add-item-row {
+  border-bottom-color: #334155;
+}
+
+.invoice-totals {
+  border-top-color: #334155;
+}
+
+.grand-total-row td {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+.party-print-row {
+  border-bottom-color: #475569;
+}
+
+/* Pagination */
+.page-btn {
+  background: #1e293b;
+  border-color: #475569;
+  color: #94a3b8;
+}
+
+.page-btn:hover,
+.page-btn.active {
+  background: #0ea5e9;
+  color: #ffffff;
+  border-color: #0ea5e9;
+}
+
+/* Summary Pills */
+.summary-pill {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+.summary-pill strong {
+  color: #e2e8f0;
+}
+
+/* Page buttons */
+.btn-icon:hover {
+  background: #0f172a;
+}
+
+/* Auth form in dark mode */
+.auth-form .form-title {
+  color: #e2e8f0;
+}
+
+.auth-form .form-subtitle {
+  color: #64748b;
+}
+
+.switch-auth {
+  color: #94a3b8;
+}
+
+.switch-auth a {
+  color: #38bdf8;
+}
+
+.forgot-link {
+  color: #38bdf8;
+}
+
+/* Totals table */
+.totals-table td {
+  color: #e2e8f0;
+}
+
+.totals-label {
+  color: #94a3b8;
+}
+
+/* Settings checkbox */
+.checkbox-label {
+  color: #e2e8f0;
+}
+
+/* Filter bar */
+.filter-bar input {
+  color: #e2e8f0;
+}
+
+/* Dark toggle icon swap */
+/* Add this class via JS when dark mode is on */
+.dark-mode-on .dark-toggle {
+  content: "☀️";
+}

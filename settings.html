@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - Khuwaja Surgical</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dark-mode.css" id="dark-mode-css" disabled>
+</head>
+
+<body>
+
+  <!-- ===== SETTINGS PAGE ===== -->
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon-sm">🏥</span>
+      <span>Khuwaja Surgical</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="nav-link">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="inventory.html" class="nav-link">
+        <span class="nav-icon">📦</span> Inventory
+      </a>
+      <a href="billing.html" class="nav-link">
+        <span class="nav-icon">🧾</span> New Bill
+      </a>
+      <a href="bills.html" class="nav-link">
+        <span class="nav-icon">📋</span> Bills
+      </a>
+      <a href="settings.html" class="nav-link active">
+        <span class="nav-icon">⚙️</span> Settings
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="login.html" class="nav-link logout-link">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Wrapper -->
+  <div class="main-wrapper">
+
+    <!-- Header -->
+    <header class="top-header">
+      <button class="menu-toggle" id="menu-toggle">☰</button>
+      <div class="header-title">Settings</div>
+      <div class="header-right">
+        <button class="dark-toggle" id="dark-toggle" title="Toggle Dark Mode">🌙</button>
+        <div class="user-badge">Admin</div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="page-content">
+
+      <!-- Business Settings -->
+      <div class="section-block">
+        <h3 class="section-title">🏢 Business Information</h3>
+        <form class="settings-form" action="#" method="post">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="biz-name">Business Name</label>
+              <input type="text" id="biz-name" name="business_name" value="Khuwaja Surgical" required>
+            </div>
+            <div class="form-group">
+              <label for="biz-phone">Phone Number</label>
+              <input type="text" id="biz-phone" name="phone" value="0300-1234567">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="biz-address">Business Address</label>
+            <textarea id="biz-address" name="address" rows="3"
+              placeholder="Full business address">Main Bazar, Sukkur, Sindh, Pakistan</textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="biz-email">Business Email</label>
+            <input type="email" id="biz-email" name="email" placeholder="info@khuwajasurical.com">
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">💾 Save Business Info</button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Tax & Billing Settings -->
+      <div class="section-block">
+        <h3 class="section-title">💰 Tax & Billing Settings</h3>
+        <form class="settings-form" action="#" method="post">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tax-rate">Tax Rate (%)</label>
+              <input type="number" id="tax-rate" name="tax_rate" value="17" step="0.1" min="0" max="100">
+              <small class="field-hint">Standard GST in Pakistan is 17%</small>
+            </div>
+            <div class="form-group">
+              <label for="currency">Currency</label>
+              <select id="currency" name="currency">
+                <option value="PKR" selected>PKR (Rs.)</option>
+                <option value="USD">USD ($)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="low-stock-threshold">Low Stock Alert Below</label>
+              <input type="number" id="low-stock-threshold" name="low_stock" value="10" min="1">
+              <small class="field-hint">Alert when stock falls below this</small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="invoice-prefix">Invoice Number Prefix</label>
+              <input type="text" id="invoice-prefix" name="prefix" value="#" maxlength="5">
+            </div>
+            <div class="form-group">
+              <label for="invoice-start">Starting Invoice Number</label>
+              <input type="number" id="invoice-start" name="inv_start" value="1001" min="1">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">💾 Save Tax Settings</button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Print Layout Settings -->
+      <div class="section-block">
+        <h3 class="section-title">🖨️ Print Layout Settings</h3>
+        <form class="settings-form" action="#" method="post">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="print-width">Receipt Width</label>
+              <select id="print-width" name="print_width">
+                <option value="58mm">58mm (Narrow Receipt)</option>
+                <option value="80mm" selected>80mm (Standard Receipt)</option>
+                <option value="A4">A4 (Full Page)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Print Options</label>
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="show_logo" checked> Show Shop Name
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="show_tax" checked> Show Tax Breakdown
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="show_footer" checked> Show Footer Message
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="footer-msg">Receipt Footer Message</label>
+            <input type="text" id="footer-msg" name="footer_msg"
+              value="Thank you for your business! | Khuwaja Surgical">
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">💾 Save Print Settings</button>
+            <button type="button" class="btn btn-outline" onclick="window.print()">🖨️ Test Print</button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- User / Password Settings -->
+      <div class="section-block">
+        <h3 class="section-title">🔐 Change Password</h3>
+        <form class="settings-form" action="#" method="post">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="current-pass">Current Password</label>
+              <input type="password" id="current-pass" name="current_password" placeholder="Current password">
+            </div>
+            <div class="form-group">
+              <label for="new-pass">New Password</label>
+              <input type="password" id="new-pass" name="new_password" placeholder="New password">
+            </div>
+            <div class="form-group">
+              <label for="confirm-pass">Confirm New Password</label>
+              <input type="password" id="confirm-pass" name="confirm_password" placeholder="Repeat new password">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">🔒 Update Password</button>
+          </div>
+
+        </form>
+      </div>
+
+    </main>
+  </div>
+  <script src="js/db.js"></script>
+  <script src="js/helpers.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/backup.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('SW: Registered ✓'))
+        .catch(err => console.error('SW: Failed -', err));
+    }
+  </script>
+
+</body>
+
+</html>

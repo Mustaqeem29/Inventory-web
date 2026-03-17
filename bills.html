@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bills - Khuwaja Surgical</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dark-mode.css" id="dark-mode-css" disabled>
+</head>
+
+<body>
+
+  <!-- ===== BILLS PAGE ===== -->
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon-sm">🏥</span>
+      <span>Khuwaja Surgical</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="nav-link">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="inventory.html" class="nav-link">
+        <span class="nav-icon">📦</span> Inventory
+      </a>
+      <a href="billing.html" class="nav-link">
+        <span class="nav-icon">🧾</span> New Bill
+      </a>
+      <a href="bills.html" class="nav-link active">
+        <span class="nav-icon">📋</span> Bills
+      </a>
+      <a href="settings.html" class="nav-link">
+        <span class="nav-icon">⚙️</span> Settings
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="login.html" class="nav-link logout-link">
+        <span class="nav-icon">🚪</span> Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Wrapper -->
+  <div class="main-wrapper">
+
+    <!-- Header -->
+    <header class="top-header">
+      <button class="menu-toggle" id="menu-toggle">☰</button>
+      <div class="header-title">All Bills</div>
+      <div class="header-right">
+        <button class="dark-toggle" id="dark-toggle" title="Toggle Dark Mode">🌙</button>
+        <div class="user-badge">Admin</div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="page-content">
+
+      <!-- Filter / Search Row -->
+      <div class="section-block">
+        <div class="section-header-row">
+          <h3 class="section-title">Invoice History</h3>
+          <a href="billing.html" class="btn btn-primary btn-sm">➕ New Bill</a>
+        </div>
+
+        <div class="filter-bar">
+          <input type="text" placeholder="🔍 Search by customer or bill #" class="search-input">
+          <input type="date" class="filter-date" title="From Date">
+          <input type="date" class="filter-date" title="To Date">
+          <button class="btn btn-outline btn-sm">Filter</button>
+        </div>
+
+        <!-- Bills Table -->
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Bill #</th>
+                <th>Customer Name</th>
+                <th>Phone</th>
+                <th>Seller</th>
+                <th>Date</th>
+                <th>Items</th>
+                <th>Total Amount</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>#1043</strong></td>
+                <td>Walk-in Customer</td>
+                <td>---</td>
+                <td>Admin</td>
+                <td>11 Mar 2026</td>
+                <td>3</td>
+                <td><strong>Rs. 8,658</strong></td>
+                <td class="action-btns">
+                  <button class="btn btn-sm btn-outline">🖨️ Print</button>
+                  <button class="btn-icon btn-delete" title="Delete">🗑️</button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>#1042</strong></td>
+                <td>Rehman Medical</td>
+                <td>0301-2345678</td>
+                <td>Admin</td>
+                <td>11 Mar 2026</td>
+                <td>5</td>
+                <td><strong>Rs. 8,500</strong></td>
+                <td class="action-btns">
+                  <button class="btn btn-sm btn-outline">🖨️ Print</button>
+                  <button class="btn-icon btn-delete" title="Delete">🗑️</button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>#1041</strong></td>
+                <td>City Pharmacy</td>
+                <td>0333-9876543</td>
+                <td>Admin</td>
+                <td>11 Mar 2026</td>
+                <td>8</td>
+                <td><strong>Rs. 12,300</strong></td>
+                <td class="action-btns">
+                  <button class="btn btn-sm btn-outline">🖨️ Print</button>
+                  <button class="btn-icon btn-delete" title="Delete">🗑️</button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>#1040</strong></td>
+                <td>Khan Surgical</td>
+                <td>0345-1122334</td>
+                <td>Admin</td>
+                <td>10 Mar 2026</td>
+                <td>2</td>
+                <td><strong>Rs. 5,750</strong></td>
+                <td class="action-btns">
+                  <button class="btn btn-sm btn-outline">🖨️ Print</button>
+                  <button class="btn-icon btn-delete" title="Delete">🗑️</button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>#1039</strong></td>
+                <td>Al-Shifa Store</td>
+                <td>0312-5566778</td>
+                <td>Admin</td>
+                <td>10 Mar 2026</td>
+                <td>11</td>
+                <td><strong>Rs. 18,900</strong></td>
+                <td class="action-btns">
+                  <button class="btn btn-sm btn-outline">🖨️ Print</button>
+                  <button class="btn-icon btn-delete" title="Delete">🗑️</button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>#1038</strong></td>
+                <td>Noor Medical Hall</td>
+                <td>0322-9988776</td>
+                <td>Admin</td>
+                <td>09 Mar 2026</td>
+                <td>6</td>
+                <td><strong>Rs. 7,200</strong></td>
+                <td class="action-btns">
+                  <button class="btn btn-sm btn-outline">🖨️ Print</button>
+                  <button class="btn-icon btn-delete" title="Delete">🗑️</button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>#1037</strong></td>
+                <td>Bismillah Pharmacy</td>
+                <td>0311-4433221</td>
+                <td>Admin</td>
+                <td>09 Mar 2026</td>
+                <td>4</td>
+                <td><strong>Rs. 3,450</strong></td>
+                <td class="action-btns">
+                  <button class="btn btn-sm btn-outline">🖨️ Print</button>
+                  <button class="btn-icon btn-delete" title="Delete">🗑️</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Summary Row -->
+        <div class="bills-summary">
+          <div class="summary-pill">
+            Total Bills: <strong>7</strong>
+          </div>
+          <div class="summary-pill">
+            Total Revenue: <strong>Rs. 64,758</strong>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">Next ›</button>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+  <script src="js/db.js"></script>
+  <script src="js/helpers.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/bills.js"></script>
+  <script src="js/print.js"></script>
+  <script src="js/backup.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('SW: Registered ✓'))
+        .catch(err => console.error('SW: Failed -', err));
+    }
+  </script>
+
+</body>
+
+</html>
