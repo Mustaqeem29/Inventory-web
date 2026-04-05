@@ -1,135 +1,229 @@
 /* =======================================================
-   js/inventory.js
-   Khuwaja Surgical — Inventory Management
-   Features: Add / Edit / Delete / Search items
-   Depends on: db.js, auth.js, ui.js
-   Add <script src="js/inventory.js"></script> to inventory.html
+   js/inventory.js - Khuwaja Surgical — Inventory Management
+   FIXED VERSION — Handles 20+ items, full CRUD, search
    ======================================================= */
 
-/* -------------------------------------------------------
-   STATE
-   editingItemId  — holds the DB id of the item being
-                    edited, or null when adding a new one.
-   allItems       — in-memory cache of all items from DB.
-------------------------------------------------------- */
 let editingItemId = null;
 let allItems = [];
+let currentPage = 1;
+const ITEMS_PER_PAGE = 10;
 
 /* =======================================================
-   RENDER — draw the items table from an array
+   RENDER TABLE
    ======================================================= */
-
-/* -------------------------------------------------------
-   renderItemsTable(items)
-   Clears and redraws the inventory table.
-   Called after every add / edit / delete / search.
-   @param {Array} items - Array of item objects to display
-------------------------------------------------------- */
 function renderItemsTable(items) {
-    const tbody = document.getElementById('items-tbody');
-    if (!tbody) return;
+  const tbody = document.getElementById('items-tbody');
+  if (!tbody) return;
 
-    // Empty state message
-    if (!items || items.length === 0) {
-        tbody.innerHTML = `
+  if (!items || items.length === 0) {
+    tbody.innerHTML = `
       <tr>
-        <td colspan="10" style="text-align:center;padding:24px;color:#94a3b8;">
-          No items found. Add your first item above.
+        <td colspan="10" style="text-align:center;padding:32px;color:#94a3b8;">
+          📦 No items found. Add your first item using the form above.
         </td>
       </tr>`;
-        return;
+    updateItemsCount(0, 0);
+    renderPagination(0);
+    return;
+  }
+
+  // ---- Pagination ----
+  const totalItems = items.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  currentPage = Math.min(currentPage, totalPages);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
+  const pageItems = items.slice(startIndex, endIndex);
+
+  updateItemsCount(startIndex + 1, endIndex, totalItems);
+  renderPagination(totalPages, items);
+
+  const lowLimit = parseInt(localStorage.getItem('ksLowStockLimit') || '10');
+
+  tbody.innerHTML = pageItems.map((item, index) => {
+    const stockNum = parseInt(item.currentStock) || 0;
+    let stockBadge;
+    if (stockNum <= 0) {
+      stockBadge = `<span class="badge badge-red">Out</span>`;
+    } else if (stockNum <= lowLimit) {
+      stockBadge = `<span class="badge badge-red">Low</span>`;
+    } else if (stockNum <= lowLimit * 2) {
+      stockBadge = `<span class="badge badge-yellow">Mid</span>`;
+    } else {
+      stockBadge = `<span class="badge badge-green">OK</span>`;
     }
 
-    // Build one row per item
-    tbody.innerHTML = items.map((item, index) => {
-
-        // Stock status badge
-        const lowLimit = parseInt(localStorage.getItem('ksLowStockLimit') || '10');
-        const stockNum = parseInt(item.currentStock) || 0;
-        let stockBadge;
-        if (stockNum <= 0) {
-            stockBadge = `<span class="badge badge-red">Out</span>`;
-        } else if (stockNum <= lowLimit) {
-            stockBadge = `<span class="badge badge-red">Low</span>`;
-        } else if (stockNum <= lowLimit * 2) {
-            stockBadge = `<span class="badge badge-yellow">Mid</span>`;
-        } else {
-            stockBadge = `<span class="badge badge-green">OK</span>`;
-        }
-
-        return `
+    return `
       <tr>
-        <td>${index + 1}</td>
-        <td><strong>${escHtml(item.itemCode)}</strong></td>
-        <td>${escHtml(item.itemName)}</td>
-        <td>${escHtml(item.category)}</td>
-        <td>${escHtml(item.supplier || '---')}</td>
-        <td>${formatCurrency(item.buyingRate)}</td>
-        <td>${formatCurrency(item.sellingRate)}</td>
-        <td>${stockNum}</td>
+        <td>${startIndex + index + 1}</td>
+        <td><strong>${esc(item.itemCode)}</strong></td>
+        <td>${esc(item.itemName)}</td>
+        <td>${esc(item.category)}</td>
+        <td>${esc(item.supplier || '---')}</td>
+        <td>Rs. ${parseFloat(item.buyingRate || 0).toFixed(2)}</td>
+        <td>Rs. ${parseFloat(item.sellingRate || 0).toFixed(2)}</td>
+        <td><strong>${stockNum}</strong></td>
         <td>${stockBadge}</td>
         <td class="action-btns">
-          <button class="btn-icon btn-edit"
-            onclick="startEditItem(${item.id})" title="Edit">✏️</button>
-          <button class="btn-icon btn-delete"
-            onclick="confirmDeleteItem(${item.id})" title="Delete">🗑️</button>
+          <button class="btn-icon" onclick="startEditItem(${item.id})" title="Edit">✏️</button>
+          <button class="btn-icon" onclick="confirmDeleteItem(${item.id})" title="Delete">🗑️</button>
         </td>
       </tr>`;
-    }).join('');
+  }).join('');
+}
+
+/* -------------------------------------------------------
+   updateItemsCount(from, to, total)
+------------------------------------------------------- */
+function updateItemsCount(from, to, total) {
+  const el = document.getElementById('items-count');
+  if (el) {
+    el.textContent = total > 0
+      ? `Showing ${from}–${to} of ${total} items`
+      : 'No items';
+  }
+}
+
+/* -------------------------------------------------------
+   renderPagination(totalPages, items)
+------------------------------------------------------- */
+function renderPagination(totalPages, items) {
+  const container = document.getElementById('inventory-pagination');
+  if (!container) return;
+
+  if (totalPages <= 1) {
+    container.innerHTML = '';
+    return;
+  }
+
+  let html = '';
+
+  // Previous button
+  html += `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''}
+    onclick="goToPage(${currentPage - 1}, currentFilteredItems)">‹ Prev</button>`;
+
+  // Page numbers
+  for (let i = 1; i <= totalPages; i++) {
+    html += `<button class="page-btn ${i === currentPage ? 'active' : ''}"
+      onclick="goToPage(${i}, currentFilteredItems)">${i}</button>`;
+  }
+
+  // Next button
+  html += `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''}
+    onclick="goToPage(${currentPage + 1}, currentFilteredItems)">Next ›</button>`;
+
+  container.innerHTML = html;
+}
+
+// Keep track of filtered items for pagination
+let currentFilteredItems = [];
+
+/* -------------------------------------------------------
+   goToPage(page, items)
+------------------------------------------------------- */
+function goToPage(page, items) {
+  currentPage = page;
+  renderItemsTable(items || allItems);
 }
 
 /* =======================================================
-   LOAD — fetch all items from DB and render
+   LOAD ITEMS FROM DB
    ======================================================= */
-
-/* -------------------------------------------------------
-   loadItems()
-   Reads all items from IndexedDB, saves to allItems cache,
-   then renders the table.
-------------------------------------------------------- */
 async function loadItems() {
-    try {
-        showLoader();
-        allItems = await getAllData('items');
-        // Sort by newest first (by createdAt)
-        allItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        renderItemsTable(allItems);
-    } catch (err) {
-        showToast('Failed to load items: ' + err.message, 'error');
-    } finally {
-        hideLoader();
-    }
+  try {
+    showLoader();
+    allItems = await getAllData('items');
+
+    // Sort newest first
+    allItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    currentFilteredItems = [...allItems];
+    renderItemsTable(currentFilteredItems);
+
+  } catch (err) {
+    console.error('[Inventory] loadItems error:', err);
+    showToast('Failed to load items. Please refresh.', 'error');
+  } finally {
+    hideLoader();
+  }
 }
 
 /* =======================================================
-   ADD / EDIT — form submit handler
+   ADD / EDIT FORM SUBMIT
    ======================================================= */
-
-/* -------------------------------------------------------
-   handleItemFormSubmit(e)
-   Called when the add-item form is submitted.
-   Decides whether to add a new item or update existing.
-------------------------------------------------------- */
 async function handleItemFormSubmit(e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    // ---- Read form values ----
-    const itemCode = document.getElementById('item-code').value.trim().toUpperCase();
-    const itemName = document.getElementById('item-name').value.trim();
-    const category = document.getElementById('category').value;
-    const supplier = document.getElementById('supplier').value.trim();
-    const buyingRate = parseFloat(document.getElementById('buying-rate').value) || 0;
-    const sellingRate = parseFloat(document.getElementById('selling-rate').value) || 0;
-    const currentStock = parseInt(document.getElementById('stock').value) || 0;
+  const submitBtn = document.getElementById('item-submit-btn');
+  const originalTxt = submitBtn?.textContent || 'Add Item';
 
-    // ---- Basic validation ----
-    if (!itemCode) { showToast('Item code is required.', 'warning'); return; }
-    if (!itemName) { showToast('Item name is required.', 'warning'); return; }
-    if (!category) { showToast('Please select a category.', 'warning'); return; }
-    if (sellingRate <= 0) { showToast('Selling rate must be greater than 0.', 'warning'); return; }
+  // Read values
+  const itemCode = document.getElementById('item-code')?.value.trim().toUpperCase() || '';
+  const itemName = document.getElementById('item-name')?.value.trim() || '';
+  const category = document.getElementById('category')?.value || '';
+  const supplier = document.getElementById('supplier')?.value.trim() || '';
+  const buyingRate = parseFloat(document.getElementById('buying-rate')?.value) || 0;
+  const sellingRate = parseFloat(document.getElementById('selling-rate')?.value) || 0;
+  const currentStock = parseInt(document.getElementById('stock')?.value) || 0;
 
-    // ---- Build item object ----
-    const itemData = {
+  // ---- Validation ----
+  if (!itemCode) { showToast('Item code is required.', 'warning'); return; }
+  if (!itemName) { showToast('Item name is required.', 'warning'); return; }
+  if (!category) { showToast('Please select a category.', 'warning'); return; }
+  if (sellingRate <= 0) { showToast('Selling rate must be greater than 0.', 'warning'); return; }
+  if (currentStock < 0) { showToast('Stock cannot be negative.', 'warning'); return; }
+
+  // ---- Disable button ----
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.textContent = editingItemId ? 'Updating...' : 'Adding...';
+  }
+
+  try {
+    showLoader();
+
+    if (editingItemId) {
+      // ---- UPDATE ----
+
+      // Check duplicate itemCode (allow same item)
+      const duplicate = allItems.find(i => i.itemCode === itemCode && i.id !== editingItemId);
+      if (duplicate) {
+        showToast('Another item already uses this item code.', 'error');
+        return;
+      }
+
+      const existing = await getDataById('items', editingItemId);
+      if (!existing) {
+        showToast('Item not found. Please refresh.', 'error');
+        return;
+      }
+
+      const updated = {
+        ...existing,
+        itemCode,
+        itemName,
+        category,
+        supplier,
+        buyingRate,
+        sellingRate,
+        currentStock
+      };
+
+      await updateData('items', updated);
+      showToast(`"${itemName}" updated successfully.`, 'success');
+      cancelEdit();
+
+    } else {
+      // ---- ADD NEW ----
+
+      // Check duplicate itemCode
+      const duplicate = allItems.find(i => i.itemCode === itemCode);
+      if (duplicate) {
+        showToast(`Item code "${itemCode}" already exists. Use a unique code.`, 'error');
+        return;
+      }
+
+      await addData('items', {
         itemCode,
         itemName,
         category,
@@ -137,228 +231,166 @@ async function handleItemFormSubmit(e) {
         buyingRate,
         sellingRate,
         currentStock,
-        dateAdded: editingItemId ? undefined : getTodayISO() // Only set on new items
-    };
+        dateAdded: new Date().toISOString().split('T')[0]
+      });
 
-    try {
-        showLoader();
-
-        if (editingItemId) {
-            // ---- UPDATE existing item ----
-
-            // Duplicate itemCode check (allow same code for same item)
-            const duplicate = allItems.find(
-                i => i.itemCode === itemCode && i.id !== editingItemId
-            );
-            if (duplicate) {
-                showToast('Another item already uses this item code.', 'error');
-                return;
-            }
-
-            // Merge with existing record to keep fields like createdAt
-            const existing = await getDataById('items', editingItemId);
-            const updatedItem = { ...existing, ...itemData };
-            await updateData('items', updatedItem);
-            showToast(`"${itemName}" updated successfully.`, 'success');
-            cancelEdit();
-
-        } else {
-            // ---- ADD new item ----
-
-            // Check for duplicate itemCode
-            const duplicate = allItems.find(i => i.itemCode === itemCode);
-            if (duplicate) {
-                showToast('An item with this code already exists.', 'error');
-                return;
-            }
-
-            itemData.dateAdded = getTodayISO();
-            await addData('items', itemData);
-            showToast(`"${itemName}" added to inventory.`, 'success');
-        }
-
-        // Reload and reset form
-        await loadItems();
-        resetItemForm();
-
-    } catch (err) {
-        console.error('[Inventory] Save error:', err);
-        if (err.name === 'ConstraintError') {
-            showToast('Item code already exists. Use a unique code.', 'error');
-        } else {
-            showToast('Could not save item. Please try again.', 'error');
-        }
-    } finally {
-        hideLoader();
+      showToast(`"${itemName}" added to inventory ✅`, 'success');
     }
+
+    // Reset page to 1 after add/edit
+    currentPage = 1;
+    await loadItems();
+    resetItemForm();
+
+  } catch (err) {
+    console.error('[Inventory] handleItemFormSubmit error:', err);
+    if (err.name === 'ConstraintError') {
+      showToast('Item code already exists. Use a unique code.', 'error');
+    } else {
+      showToast('Could not save item: ' + err.message, 'error');
+    }
+  } finally {
+    hideLoader();
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalTxt;
+    }
+  }
 }
 
 /* =======================================================
-   EDIT — populate form with existing item data
+   EDIT
    ======================================================= */
-
-/* -------------------------------------------------------
-   startEditItem(id)
-   Fetches the item by ID, fills the form fields,
-   and switches the submit button to "Update Item".
-   @param {number} id - IndexedDB item ID
-------------------------------------------------------- */
 async function startEditItem(id) {
-    try {
-        const item = await getDataById('items', id);
-        if (!item) { showToast('Item not found.', 'error'); return; }
+  try {
+    const item = await getDataById('items', Number(id));
+    if (!item) { showToast('Item not found.', 'error'); return; }
 
-        // ---- Fill form fields ----
-        document.getElementById('item-code').value = item.itemCode || '';
-        document.getElementById('item-name').value = item.itemName || '';
-        document.getElementById('category').value = item.category || '';
-        document.getElementById('supplier').value = item.supplier || '';
-        document.getElementById('buying-rate').value = item.buyingRate || '';
-        document.getElementById('selling-rate').value = item.sellingRate || '';
-        document.getElementById('stock').value = item.currentStock || '';
+    document.getElementById('item-code').value = item.itemCode || '';
+    document.getElementById('item-name').value = item.itemName || '';
+    document.getElementById('category').value = item.category || '';
+    document.getElementById('supplier').value = item.supplier || '';
+    document.getElementById('buying-rate').value = item.buyingRate || '';
+    document.getElementById('selling-rate').value = item.sellingRate || '';
+    document.getElementById('stock').value = item.currentStock || '';
 
-        // ---- Update UI state ----
-        editingItemId = id;
-
-        const submitBtn = document.getElementById('item-submit-btn');
-        if (submitBtn) submitBtn.textContent = '💾 Update Item';
-
-        const cancelBtn = document.getElementById('item-cancel-btn');
-        if (cancelBtn) cancelBtn.style.display = 'inline-flex';
-
-        const formTitle = document.getElementById('form-title');
-        if (formTitle) formTitle.textContent = `Edit Item: ${item.itemName}`;
-
-        // Scroll to form smoothly
-        document.getElementById('item-form')?.scrollIntoView({ behavior: 'smooth' });
-
-    } catch (err) {
-        showToast('Could not load item for editing.', 'error');
-    }
-}
-
-/* -------------------------------------------------------
-   cancelEdit()
-   Resets edit state and clears the form.
-------------------------------------------------------- */
-function cancelEdit() {
-    editingItemId = null;
-    resetItemForm();
+    editingItemId = id;
 
     const submitBtn = document.getElementById('item-submit-btn');
-    if (submitBtn) submitBtn.textContent = '➕ Add Item';
+    if (submitBtn) submitBtn.textContent = '💾 Update Item';
 
     const cancelBtn = document.getElementById('item-cancel-btn');
-    if (cancelBtn) cancelBtn.style.display = 'none';
+    if (cancelBtn) cancelBtn.style.display = 'inline-flex';
 
     const formTitle = document.getElementById('form-title');
-    if (formTitle) formTitle.textContent = 'Add New Item';
+    if (formTitle) formTitle.textContent = `✏️ Edit Item: ${item.itemName}`;
+
+    // Scroll to form
+    document.getElementById('item-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch (err) {
+    showToast('Could not load item for editing.', 'error');
+  }
 }
 
-/* -------------------------------------------------------
-   resetItemForm()
-   Clears all form input fields.
-------------------------------------------------------- */
+function cancelEdit() {
+  editingItemId = null;
+  resetItemForm();
+
+  const submitBtn = document.getElementById('item-submit-btn');
+  if (submitBtn) submitBtn.textContent = '➕ Add Item';
+
+  const cancelBtn = document.getElementById('item-cancel-btn');
+  if (cancelBtn) cancelBtn.style.display = 'none';
+
+  const formTitle = document.getElementById('form-title');
+  if (formTitle) formTitle.textContent = 'Add New Item';
+}
+
 function resetItemForm() {
-    const form = document.getElementById('item-form');
-    if (form) form.reset();
+  document.getElementById('item-form')?.reset();
 }
 
 /* =======================================================
    DELETE
    ======================================================= */
-
-/* -------------------------------------------------------
-   confirmDeleteItem(id)
-   Shows a confirmation dialog, then deletes if confirmed.
-   @param {number} id - IndexedDB item ID
-------------------------------------------------------- */
 async function confirmDeleteItem(id) {
-    const item = allItems.find(i => i.id === id);
-    const name = item ? item.itemName : 'this item';
+  const item = allItems.find(i => i.id === id);
+  const name = item ? item.itemName : 'this item';
 
-    const confirmed = await showConfirm(
-        `Delete "${name}" from inventory? This cannot be undone.`
-    );
-    if (!confirmed) return;
+  const confirmed = await showConfirm(
+    `Delete "${name}" from inventory?\n\nThis cannot be undone.`
+  );
+  if (!confirmed) return;
 
-    try {
-        showLoader();
-        await deleteData('items', id);
-        showToast(`"${name}" deleted.`, 'success');
-        await loadItems();
-    } catch (err) {
-        showToast('Could not delete item.', 'error');
-    } finally {
-        hideLoader();
-    }
+  try {
+    showLoader();
+    await deleteData('items', Number(id));
+    showToast(`"${name}" deleted successfully.`, 'success');
+
+    // Go back one page if last item on page was deleted
+    const remaining = allItems.filter(i => i.id !== id);
+    const totalPages = Math.ceil(remaining.length / ITEMS_PER_PAGE);
+    if (currentPage > totalPages && currentPage > 1) currentPage--;
+
+    await loadItems();
+  } catch (err) {
+    showToast('Could not delete item: ' + err.message, 'error');
+  } finally {
+    hideLoader();
+  }
 }
 
 /* =======================================================
    SEARCH
    ======================================================= */
-
-/* -------------------------------------------------------
-   handleSearch(e)
-   Filters the in-memory allItems cache using the search
-   term and re-renders the table. No DB calls needed.
-------------------------------------------------------- */
 function handleSearch(e) {
-    const term = e.target.value.trim();
-    const filtered = filterData(allItems, term, [
-        'itemCode', 'itemName', 'category', 'supplier'
-    ]);
-    renderItemsTable(filtered);
+  const term = e.target.value.trim().toLowerCase();
+  currentPage = 1; // reset to first page on search
+
+  if (!term) {
+    currentFilteredItems = [...allItems];
+  } else {
+    currentFilteredItems = allItems.filter(item =>
+      (item.itemCode || '').toLowerCase().includes(term) ||
+      (item.itemName || '').toLowerCase().includes(term) ||
+      (item.category || '').toLowerCase().includes(term) ||
+      (item.supplier || '').toLowerCase().includes(term)
+    );
+  }
+
+  renderItemsTable(currentFilteredItems);
 }
 
 /* =======================================================
-   UTILITY
+   BUILD PAGE HTML
    ======================================================= */
-
-/* escHtml(str) — escape HTML to prevent XSS */
-function escHtml(str) {
-    if (!str) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
-
-/* =======================================================
-   PAGE INIT — inject dynamic HTML & wire events
-   ======================================================= */
-
-/* -------------------------------------------------------
-   buildInventoryPage()
-   Injects the add-item form and items table HTML into
-   the page content area, then wires all event listeners.
-   Called once on DOMContentLoaded.
-------------------------------------------------------- */
 function buildInventoryPage() {
-    const main = document.querySelector('.page-content');
-    if (!main) return;
+  const main = document.querySelector('.page-content');
+  if (!main) return;
 
-    main.innerHTML = `
+  main.innerHTML = `
 
-    <!-- ===== ADD / EDIT ITEM FORM ===== -->
+    <!-- ADD / EDIT FORM -->
     <div class="section-block">
       <h3 class="section-title" id="form-title">Add New Item</h3>
-      <form id="item-form">
+      <form id="item-form" autocomplete="off">
 
         <div class="form-row">
           <div class="form-group">
             <label for="item-code">Item Code *</label>
-            <input type="text" id="item-code" placeholder="e.g. SRG-001" required>
+            <input type="text" id="item-code" placeholder="e.g. SRG-001"
+              autocomplete="off" required>
           </div>
           <div class="form-group">
             <label for="item-name">Item Name *</label>
-            <input type="text" id="item-name" placeholder="e.g. Surgical Gloves" required>
+            <input type="text" id="item-name" placeholder="e.g. Surgical Gloves"
+              autocomplete="off" required>
           </div>
           <div class="form-group">
             <label for="category">Category *</label>
             <select id="category" required>
-              <option value="">-- Select --</option>
+              <option value="">-- Select Category --</option>
               <option>PPE</option>
               <option>Syringes</option>
               <option>Dressings</option>
@@ -370,20 +402,21 @@ function buildInventoryPage() {
           </div>
           <div class="form-group">
             <label for="supplier">Supplier</label>
-            <input type="text" id="supplier" placeholder="Supplier name">
+            <input type="text" id="supplier" placeholder="Supplier name"
+              autocomplete="off">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="buying-rate">Buying Rate (Rs.) *</label>
+            <label for="buying-rate">Buying Rate (Rs.)</label>
             <input type="number" id="buying-rate" placeholder="0.00"
               step="0.01" min="0">
           </div>
           <div class="form-group">
             <label for="selling-rate">Selling Rate (Rs.) *</label>
             <input type="number" id="selling-rate" placeholder="0.00"
-              step="0.01" min="0" required>
+              step="0.01" min="0.01" required>
           </div>
           <div class="form-group">
             <label for="stock">Stock Quantity *</label>
@@ -407,14 +440,18 @@ function buildInventoryPage() {
       </form>
     </div>
 
-    <!-- ===== ITEMS TABLE ===== -->
+    <!-- ITEMS TABLE -->
     <div class="section-block">
       <div class="section-header-row">
-        <h3 class="section-title">All Inventory Items</h3>
+        <h3 class="section-title">
+          All Inventory Items
+          <span id="items-count" style="font-size:12px;color:#94a3b8;
+            font-weight:400;margin-left:8px;"></span>
+        </h3>
         <div class="search-bar">
           <input type="text" id="inventory-search"
-            placeholder="🔍 Search by name, code, category..."
-            class="search-input">
+            placeholder="🔍 Search by name, code, category, supplier..."
+            class="search-input" autocomplete="off">
         </div>
       </div>
 
@@ -436,7 +473,7 @@ function buildInventoryPage() {
           </thead>
           <tbody id="items-tbody">
             <tr>
-              <td colspan="10" style="text-align:center;padding:24px;color:#94a3b8;">
+              <td colspan="10" style="text-align:center;padding:32px;color:#94a3b8;">
                 Loading inventory...
               </td>
             </tr>
@@ -444,29 +481,46 @@ function buildInventoryPage() {
         </table>
       </div>
 
+      <!-- Pagination -->
+      <div class="pagination" id="inventory-pagination"></div>
+
     </div>`;
 
-    // ---- Wire events ----
-    document.getElementById('item-form')
-        .addEventListener('submit', handleItemFormSubmit);
+  // Wire events
+  document.getElementById('item-form')
+    ?.addEventListener('submit', handleItemFormSubmit);
 
-    document.getElementById('inventory-search')
-        .addEventListener('input', handleSearch);
+  document.getElementById('inventory-search')
+    ?.addEventListener('input', handleSearch);
 }
 
 /* =======================================================
-   AUTO-INIT on DOM ready (inventory.html only)
+   UTILITY
+   ======================================================= */
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+/* =======================================================
+   AUTO-INIT — wait for dbReady event
    ======================================================= */
 document.addEventListener('DOMContentLoaded', function () {
-    // Only run on inventory page
-    if (!window.location.pathname.includes('inventory')) return;
+  const isInventory = window.location.pathname.includes('inventory');
+  if (!isInventory) return;
 
-    // Wait for DB to be ready
-    const wait = setInterval(() => {
-        if (db !== null) {
-            clearInterval(wait);
-            buildInventoryPage();
-            loadItems();
-        }
-    }, 50);
+  // Wait for DB ready event fired by db.js
+  window.addEventListener('dbReady', function () {
+    buildInventoryPage();
+    loadItems();
+  });
+
+  // Fallback: if dbReady already fired before this script ran
+  if (db !== null) {
+    buildInventoryPage();
+    loadItems();
+  }
 });

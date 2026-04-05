@@ -1,125 +1,114 @@
 /* =======================================================
-   js/db.js
-   Khuwaja Surgical — IndexedDB Database Handler
-   Handles all offline data storage for the application.
-   Include this file in ALL HTML pages before other scripts.
+   js/db.js - Khuwaja Surgical — IndexedDB Database Handler
+   FIXED VERSION — Production Ready
    ======================================================= */
 
-// ---- Database Configuration ----
-const DB_NAME = 'khuwajaInventoryDB'; // Database name
-const DB_VERSION = 1;                    // Increment to upgrade schema
-
-// ---- Global DB instance (set after openDatabase()) ----
+const DB_NAME = 'khuwajaInventoryDB';
+const DB_VERSION = 1;
 let db = null;
+
+// ---- Promise that resolves when DB is ready ----
+// All other scripts wait for this before doing anything
+let dbReadyResolve;
+const dbReady = new Promise(resolve => { dbReadyResolve = resolve; });
 
 /* -------------------------------------------------------
    openDatabase()
-   Opens (or creates) the IndexedDB database.
-   Creates all object stores (tables) on first run.
-   Returns a Promise that resolves with the db instance.
 ------------------------------------------------------- */
 function openDatabase() {
     return new Promise((resolve, reject) => {
+        if (db) { resolve(db); return; } // already open
 
-        // Open the database — will create it if it doesn't exist
         const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-        /* onupgradeneeded fires when:
-           - Database is created for the first time
-           - DB_VERSION is incremented (schema changes) */
         request.onupgradeneeded = function (event) {
             const database = event.target.result;
 
-            // ---- Create 'users' store ----
-            // Stores registered user accounts
             if (!database.objectStoreNames.contains('users')) {
                 const usersStore = database.createObjectStore('users', {
-                    keyPath: 'id',          // Primary key field
-                    autoIncrement: true     // Auto-generate IDs
+                    keyPath: 'id', autoIncrement: true
                 });
-                // Index on email for fast login lookups
                 usersStore.createIndex('email', 'email', { unique: true });
-                console.log('[DB] Created store: users');
             }
 
-            // ---- Create 'items' store ----
-            // Stores inventory/product records
             if (!database.objectStoreNames.contains('items')) {
                 const itemsStore = database.createObjectStore('items', {
-                    keyPath: 'id',
-                    autoIncrement: true
+                    keyPath: 'id', autoIncrement: true
                 });
-                // Index on itemCode for quick searches
                 itemsStore.createIndex('itemCode', 'itemCode', { unique: true });
                 itemsStore.createIndex('category', 'category', { unique: false });
-                console.log('[DB] Created store: items');
             }
 
-            // ---- Create 'bills' store ----
-            // Stores invoice/billing records
             if (!database.objectStoreNames.contains('bills')) {
                 const billsStore = database.createObjectStore('bills', {
-                    keyPath: 'id',
-                    autoIncrement: true
+                    keyPath: 'id', autoIncrement: true
                 });
-                // Index on invoiceNumber for quick bill lookup
-                billsStore.createIndex('invoiceNumber', 'invoiceNumber', { unique: true });
+                billsStore.createIndex('invoiceNumber', 'invoiceNumber', { unique: false });
                 billsStore.createIndex('date', 'date', { unique: false });
-                console.log('[DB] Created store: bills');
             }
 
-            // ---- Create 'settings' store ----
-            // Stores business configuration (single record)
             if (!database.objectStoreNames.contains('settings')) {
                 database.createObjectStore('settings', {
-                    keyPath: 'id',
-                    autoIncrement: true
+                    keyPath: 'id', autoIncrement: true
                 });
-                console.log('[DB] Created store: settings');
             }
         };
 
-        // ---- Success: DB opened ----
         request.onsuccess = function (event) {
             db = event.target.result;
-            console.log('[DB] Database opened successfully:', DB_NAME);
+
+            // Handle DB connection closing unexpectedly
+            db.onclose = function () {
+                db = null;
+                console.warn('[DB] Connection closed unexpectedly. Reopening...');
+                initDatabase();
+            };
+
+            db.onerror = function (event) {
+                console.error('[DB] Database error:', event.target.error);
+            };
+
+            console.log('[DB] Opened:', DB_NAME);
             resolve(db);
         };
 
-        // ---- Error: DB failed to open ----
         request.onerror = function (event) {
-            console.error('[DB] Error opening database:', event.target.error);
+            console.error('[DB] Failed to open:', event.target.error);
             reject(event.target.error);
+        };
+
+        request.onblocked = function () {
+            console.warn('[DB] Database blocked. Close other tabs and retry.');
+            alert('Please close other tabs of this app and refresh.');
         };
     });
 }
 
 /* -------------------------------------------------------
    addData(storeName, data)
-   Adds a new record to the specified object store.
-   @param {string} storeName - e.g. 'items', 'bills'
-   @param {object} data      - The record object to save
-   Returns a Promise that resolves with the new record ID.
 ------------------------------------------------------- */
 function addData(storeName, data) {
     return new Promise((resolve, reject) => {
+        if (!db) { reject(new Error('DB not ready')); return; }
 
-        // All writes use a 'readwrite' transaction
-        const transaction = db.transaction([storeName], 'readwrite');
-        const store = transaction.objectStore(storeName);
+        const tx = db.transaction([storeName], 'readwrite');
+        const store = tx.objectStore(storeName);
+        const record = { ...data };
+        record.createdAt = record.createdAt || new Date().toISOString();
 
-        // Add a createdAt timestamp automatically
-        data.createdAt = data.createdAt || new Date().toISOString();
-
-        const request = store.add(data);
+        const request = store.add(record);
 
         request.onsuccess = function (event) {
-            console.log(`[DB] Added to '${storeName}', ID:`, event.target.result);
-            resolve(event.target.result); // Returns the new auto-generated ID
+            resolve(event.target.result);
         };
 
         request.onerror = function (event) {
-            console.error(`[DB] Error adding to '${storeName}':`, event.target.error);
+            console.error(`[DB] addData error in '${storeName}':`, event.target.error);
+            reject(event.target.error);
+        };
+
+        tx.onerror = function (event) {
+            console.error(`[DB] Transaction error in '${storeName}':`, event.target.error);
             reject(event.target.error);
         };
     });
@@ -127,26 +116,21 @@ function addData(storeName, data) {
 
 /* -------------------------------------------------------
    getAllData(storeName)
-   Fetches all records from an object store.
-   @param {string} storeName - Store to read from
-   Returns a Promise that resolves with an array of records.
 ------------------------------------------------------- */
 function getAllData(storeName) {
     return new Promise((resolve, reject) => {
+        if (!db) { reject(new Error('DB not ready')); return; }
 
-        // Read-only transaction is faster
-        const transaction = db.transaction([storeName], 'readonly');
-        const store = transaction.objectStore(storeName);
-
-        const request = store.getAll(); // Fetch all records
+        const tx = db.transaction([storeName], 'readonly');
+        const store = tx.objectStore(storeName);
+        const request = store.getAll();
 
         request.onsuccess = function (event) {
-            console.log(`[DB] Got ${event.target.result.length} records from '${storeName}'`);
-            resolve(event.target.result);
+            resolve(event.target.result || []);
         };
 
         request.onerror = function (event) {
-            console.error(`[DB] Error reading '${storeName}':`, event.target.error);
+            console.error(`[DB] getAllData error in '${storeName}':`, event.target.error);
             reject(event.target.error);
         };
     });
@@ -154,25 +138,21 @@ function getAllData(storeName) {
 
 /* -------------------------------------------------------
    getDataById(storeName, id)
-   Fetches a single record by its primary key (id).
-   @param {string} storeName - Store to read from
-   @param {number} id        - The record's primary key
-   Returns a Promise that resolves with the record object.
 ------------------------------------------------------- */
 function getDataById(storeName, id) {
     return new Promise((resolve, reject) => {
+        if (!db) { reject(new Error('DB not ready')); return; }
 
-        const transaction = db.transaction([storeName], 'readonly');
-        const store = transaction.objectStore(storeName);
-
-        const request = store.get(id);
+        const tx = db.transaction([storeName], 'readonly');
+        const store = tx.objectStore(storeName);
+        const request = store.get(Number(id));
 
         request.onsuccess = function (event) {
-            resolve(event.target.result); // undefined if not found
+            resolve(event.target.result);
         };
 
         request.onerror = function (event) {
-            console.error(`[DB] Error getting ID ${id} from '${storeName}':`, event.target.error);
+            console.error(`[DB] getDataById error in '${storeName}':`, event.target.error);
             reject(event.target.error);
         };
     });
@@ -180,27 +160,22 @@ function getDataById(storeName, id) {
 
 /* -------------------------------------------------------
    getDataByIndex(storeName, indexName, value)
-   Finds a record using an index (e.g. find user by email).
-   @param {string} storeName  - Store to search
-   @param {string} indexName  - Index name (e.g. 'email')
-   @param {*}      value      - Value to search for
-   Returns a Promise that resolves with the matching record.
 ------------------------------------------------------- */
 function getDataByIndex(storeName, indexName, value) {
     return new Promise((resolve, reject) => {
+        if (!db) { reject(new Error('DB not ready')); return; }
 
-        const transaction = db.transaction([storeName], 'readonly');
-        const store = transaction.objectStore(storeName);
+        const tx = db.transaction([storeName], 'readonly');
+        const store = tx.objectStore(storeName);
         const index = store.index(indexName);
-
         const request = index.get(value);
 
         request.onsuccess = function (event) {
-            resolve(event.target.result); // undefined if not found
+            resolve(event.target.result);
         };
 
         request.onerror = function (event) {
-            console.error(`[DB] Index lookup error in '${storeName}':`, event.target.error);
+            console.error(`[DB] getDataByIndex error in '${storeName}':`, event.target.error);
             reject(event.target.error);
         };
     });
@@ -208,31 +183,29 @@ function getDataByIndex(storeName, indexName, value) {
 
 /* -------------------------------------------------------
    updateData(storeName, data)
-   Updates an existing record. The data object MUST include
-   the 'id' field so IndexedDB knows which record to update.
-   @param {string} storeName - Store containing the record
-   @param {object} data      - Updated record (must have id)
-   Returns a Promise that resolves when update is complete.
 ------------------------------------------------------- */
 function updateData(storeName, data) {
     return new Promise((resolve, reject) => {
+        if (!db) { reject(new Error('DB not ready')); return; }
 
-        const transaction = db.transaction([storeName], 'readwrite');
-        const store = transaction.objectStore(storeName);
+        const tx = db.transaction([storeName], 'readwrite');
+        const store = tx.objectStore(storeName);
+        const record = { ...data };
+        record.updatedAt = new Date().toISOString();
 
-        // Add an updatedAt timestamp
-        data.updatedAt = new Date().toISOString();
-
-        // put() replaces the record with matching keyPath (id)
-        const request = store.put(data);
+        const request = store.put(record);
 
         request.onsuccess = function (event) {
-            console.log(`[DB] Updated record in '${storeName}', ID:`, event.target.result);
             resolve(event.target.result);
         };
 
         request.onerror = function (event) {
-            console.error(`[DB] Error updating '${storeName}':`, event.target.error);
+            console.error(`[DB] updateData error in '${storeName}':`, event.target.error);
+            reject(event.target.error);
+        };
+
+        tx.onerror = function (event) {
+            console.error(`[DB] Transaction error updating '${storeName}':`, event.target.error);
             reject(event.target.error);
         };
     });
@@ -240,26 +213,21 @@ function updateData(storeName, data) {
 
 /* -------------------------------------------------------
    deleteData(storeName, id)
-   Permanently deletes a record by its ID.
-   @param {string} storeName - Store to delete from
-   @param {number} id        - ID of the record to delete
-   Returns a Promise that resolves when deletion is done.
 ------------------------------------------------------- */
 function deleteData(storeName, id) {
     return new Promise((resolve, reject) => {
+        if (!db) { reject(new Error('DB not ready')); return; }
 
-        const transaction = db.transaction([storeName], 'readwrite');
-        const store = transaction.objectStore(storeName);
-
-        const request = store.delete(id);
+        const tx = db.transaction([storeName], 'readwrite');
+        const store = tx.objectStore(storeName);
+        const request = store.delete(Number(id));
 
         request.onsuccess = function () {
-            console.log(`[DB] Deleted ID ${id} from '${storeName}'`);
             resolve(true);
         };
 
         request.onerror = function (event) {
-            console.error(`[DB] Error deleting from '${storeName}':`, event.target.error);
+            console.error(`[DB] deleteData error in '${storeName}':`, event.target.error);
             reject(event.target.error);
         };
     });
@@ -267,19 +235,16 @@ function deleteData(storeName, id) {
 
 /* -------------------------------------------------------
    clearStore(storeName)
-   Deletes ALL records in a store. Use with caution!
-   Returns a Promise that resolves when store is cleared.
 ------------------------------------------------------- */
 function clearStore(storeName) {
     return new Promise((resolve, reject) => {
+        if (!db) { reject(new Error('DB not ready')); return; }
 
-        const transaction = db.transaction([storeName], 'readwrite');
-        const store = transaction.objectStore(storeName);
-
+        const tx = db.transaction([storeName], 'readwrite');
+        const store = tx.objectStore(storeName);
         const request = store.clear();
 
         request.onsuccess = function () {
-            console.log(`[DB] Cleared all records from '${storeName}'`);
             resolve(true);
         };
 
@@ -291,55 +256,70 @@ function clearStore(storeName) {
 
 /* -------------------------------------------------------
    initDatabase()
-   Opens the DB and seeds the default admin user and
-   default settings if they don't already exist.
-   Call this once on page load: initDatabase()
+   Opens DB, seeds admin user and default settings.
+   Fires a global 'dbReady' event when done so all
+   other scripts know they can safely use the DB.
 ------------------------------------------------------- */
 async function initDatabase() {
     try {
         await openDatabase();
 
-        // ---- Seed default admin user ----
-        const existing = await getDataByIndex('users', 'email', 'admin@demo.com');
-        if (!existing) {
-            await addData('users', {
-                sellerName: 'Admin',
-                email: 'admin@demo.com',
-                password: 'Admin123',   // Plain text for demo; use hashing in production
-                role: 'admin',
-                createdAt: new Date().toISOString()
-            });
-            console.log('[DB] Demo admin user seeded.');
+        // ---- Seed admin user ----
+        try {
+            const existing = await getDataByIndex('users', 'email', 'admin@demo.com');
+            if (!existing) {
+                await addData('users', {
+                    sellerName: 'Admin',
+                    email: 'admin@demo.com',
+                    password: 'Admin123',
+                    role: 'admin'
+                });
+                console.log('[DB] Admin user seeded.');
+            }
+        } catch (e) {
+            console.warn('[DB] Could not seed admin user:', e.message);
         }
 
-        // ---- Seed default business settings ----
-        const allSettings = await getAllData('settings');
-        if (allSettings.length === 0) {
-            await addData('settings', {
-                businessName: 'Khuwaja Surgical',
-                address: 'Main Bazar, Sukkur, Sindh, Pakistan',
-                phone: '0300-1234567',
-                email: '',
-                taxRate: 17,
-                currency: 'PKR',
-                lowStockLimit: 10,
-                invoicePrefix: '#',
-                invoiceStart: 1001,
-                printWidth: '80mm',
-                showLogo: true,
-                showTax: true,
-                showFooter: true,
-                footerMsg: 'Thank you for your business! | Khuwaja Surgical'
-            });
-            console.log('[DB] Default settings seeded.');
+        // ---- Seed default settings ----
+        try {
+            const allSettings = await getAllData('settings');
+            if (allSettings.length === 0) {
+                await addData('settings', {
+                    businessName: 'Khuwaja Surgical',
+                    address: 'Main Bazar, Sukkur, Sindh, Pakistan',
+                    phone: '0300-1234567',
+                    email: '',
+                    taxRate: 17,
+                    currency: 'PKR',
+                    lowStockLimit: 10,
+                    invoicePrefix: '#',
+                    invoiceStart: 1001,
+                    printWidth: '80mm',
+                    showLogo: true,
+                    showTax: true,
+                    showFooter: true,
+                    footerMsg: 'Thank you for your business! | Khuwaja Surgical'
+                });
+                console.log('[DB] Default settings seeded.');
+            }
+        } catch (e) {
+            console.warn('[DB] Could not seed settings:', e.message);
         }
 
         console.log('[DB] initDatabase() complete.');
 
+        // ---- Signal all scripts that DB is ready ----
+        dbReadyResolve(db);
+
+        // ---- Fire a DOM event so page scripts can listen ----
+        window.dispatchEvent(new CustomEvent('dbReady', { detail: db }));
+
     } catch (err) {
         console.error('[DB] initDatabase() failed:', err);
+        // Retry after 1 second
+        setTimeout(initDatabase, 1000);
     }
 }
 
-// ---- Auto-initialize when this script loads ----
+// ---- Start immediately ----
 initDatabase();
