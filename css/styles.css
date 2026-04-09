@@ -1105,3 +1105,169 @@ textarea {
     text-align: left;
   }
 }
+
+/* ---- Totals Table Rows ---- */
+.invoice-total-row td {
+  color: var(--text-primary);
+  font-size: 13px;
+  padding: 5px 8px;
+}
+
+.invoice-subtotal-label {
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-align: right;
+}
+
+.invoice-subtotal-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: right;
+}
+
+.invoice-tax-label {
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-align: right;
+}
+
+.invoice-tax-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: right;
+}
+
+.invoice-discount-label {
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-align: right;
+}
+
+.invoice-discount-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: right;
+}
+
+/* Grand Total — always green bold */
+.invoice-grand-total-row td {
+  background: var(--bg-body);
+  border-top: 2px solid var(--border);
+  border-bottom: 2px solid var(--border);
+  padding: 8px;
+}
+
+.invoice-grand-label {
+  color: #16a34a;
+  font-size: 15px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.invoice-grand-value {
+  color: #16a34a;
+  font-size: 15px;
+  font-weight: 800;
+  text-align: right;
+}
+
+/* Cash Received — blue */
+.invoice-cash-label {
+  color: #0ea5e9;
+  font-weight: 700;
+  text-align: right;
+}
+
+.invoice-cash-value {
+  color: #0ea5e9;
+  font-weight: 700;
+  text-align: right;
+}
+
+/* Balance — green if positive (change), red if negative (due) */
+.invoice-balance-label {
+  font-weight: 700;
+  text-align: right;
+}
+
+.invoice-balance-value {
+  font-weight: 700;
+  text-align: right;
+}
+
+.balance-positive {
+  color: #16a34a;
+}
+
+.balance-negative {
+  color: #dc2626;
+}
+
+/* ---- Delete Button in Table ---- */
+.btn-delete-item {
+  background: none;
+  border: 1.5px solid #fca5a5;
+  color: #dc2626;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-delete-item:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+}
+
+/* ---- Edit Button in Table ---- */
+.btn-edit-item {
+  background: none;
+  border: 1.5px solid #93c5fd;
+  color: #0ea5e9;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-right: 4px;
+}
+
+.btn-edit-item:hover {
+  background: #0ea5e9;
+  color: #ffffff;
+  border-color: #0ea5e9;
+}
+
+/* =======================================================
+   DARK MODE OVERRIDES — Add to css/dark-mode.css
+   ======================================================= */
+
+/* Grand total stays green in dark mode */
+/* Cash stays blue in dark mode */
+/* These are already color-coded so no override needed */
+
+/* Balance colors stay same in dark mode */
+.dark-mode-on .invoice-grand-total-row td {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+.dark-mode-on .invoice-total-row td {
+  color: #e2e8f0;
+}
+
+.dark-mode-on .invoice-subtotal-label,
+.dark-mode-on .invoice-tax-label,
+.dark-mode-on .invoice-discount-label {
+  color: #94a3b8;
+}
+
+.dark-mode-on .invoice-subtotal-value,
+.dark-mode-on .invoice-tax-value,
+.dark-mode-on .invoice-discount-value {
+  color: #e2e8f0;
+}

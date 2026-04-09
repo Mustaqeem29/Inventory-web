@@ -9,7 +9,7 @@ let currentPage = 1;
 const ITEMS_PER_PAGE = 10;
 
 /* =======================================================
-   RENDER TABLE
+   1. REPLACE renderItemsTable() with this version
    ======================================================= */
 function renderItemsTable(items) {
   const tbody = document.getElementById('items-tbody');
@@ -18,19 +18,19 @@ function renderItemsTable(items) {
   if (!items || items.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="10" style="text-align:center;padding:32px;color:#94a3b8;">
-          📦 No items found. Add your first item using the form above.
+        <td colspan="10"
+          style="text-align:center;padding:32px;color:#94a3b8;">
+          📦 No items found. Add your first item above.
         </td>
       </tr>`;
-    updateItemsCount(0, 0);
+    updateItemsCount(0, 0, 0);
     renderPagination(0);
     return;
   }
 
-  // ---- Pagination ----
   const totalItems = items.length;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-  currentPage = Math.min(currentPage, totalPages);
+  currentPage = Math.min(currentPage, Math.max(1, totalPages));
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
   const pageItems = items.slice(startIndex, endIndex);
@@ -42,6 +42,8 @@ function renderItemsTable(items) {
 
   tbody.innerHTML = pageItems.map((item, index) => {
     const stockNum = parseInt(item.currentStock) || 0;
+
+    /* Stock badge */
     let stockBadge;
     if (stockNum <= 0) {
       stockBadge = `<span class="badge badge-red">Out</span>`;
@@ -65,8 +67,12 @@ function renderItemsTable(items) {
         <td><strong>${stockNum}</strong></td>
         <td>${stockBadge}</td>
         <td class="action-btns">
-          <button class="btn-icon" onclick="startEditItem(${item.id})" title="Edit">✏️</button>
-          <button class="btn-icon" onclick="confirmDeleteItem(${item.id})" title="Delete">🗑️</button>
+          <button class="btn-edit-item"
+            onclick="startEditItem(${item.id})"
+            title="Edit">✏️ Edit</button>
+          <button class="btn-delete-item"
+            onclick="confirmDeleteItem(${item.id})"
+            title="Delete">🗑️ Delete</button>
         </td>
       </tr>`;
   }).join('');
@@ -312,30 +318,48 @@ function resetItemForm() {
 }
 
 /* =======================================================
-   DELETE
+     REPLACE confirmDeleteItem() with this version
+      (better confirmation dialog + error handling)
    ======================================================= */
 async function confirmDeleteItem(id) {
-  const item = allItems.find(i => i.id === id);
+  /* Find item name for the confirmation message */
+  const item = allItems.find(i => i.id === id)
+    || await getDataById('items', Number(id)).catch(() => null);
+
   const name = item ? item.itemName : 'this item';
 
-  const confirmed = await showConfirm(
-    `Delete "${name}" from inventory?\n\nThis cannot be undone.`
-  );
+  /* Show confirmation */
+  let confirmed;
+  if (typeof showConfirm === 'function') {
+    confirmed = await showConfirm(
+      `Delete "${name}" from inventory?\n\nYeh action undo nahi ho sakta.`
+    );
+  } else {
+    confirmed = window.confirm(`Delete "${name}"? This cannot be undone.`);
+  }
+
   if (!confirmed) return;
 
   try {
     showLoader();
     await deleteData('items', Number(id));
-    showToast(`"${name}" deleted successfully.`, 'success');
 
-    // Go back one page if last item on page was deleted
+    if (typeof showToast === 'function') {
+      showToast(`"${name}" deleted successfully.`, 'success');
+    }
+
+    /* Adjust page if last item on current page was deleted */
     const remaining = allItems.filter(i => i.id !== id);
     const totalPages = Math.ceil(remaining.length / ITEMS_PER_PAGE);
     if (currentPage > totalPages && currentPage > 1) currentPage--;
 
     await loadItems();
+
   } catch (err) {
-    showToast('Could not delete item: ' + err.message, 'error');
+    if (typeof showToast === 'function') {
+      showToast('Delete nahi hua: ' + err.message, 'error');
+    }
+    console.error('[Inventory] confirmDeleteItem error:', err);
   } finally {
     hideLoader();
   }
@@ -524,3 +548,76 @@ document.addEventListener('DOMContentLoaded', function () {
     loadItems();
   }
 });
+
+/* =======================================================
+     ADD this new function to inventory.js
+      (paste at the bottom of inventory.js)
+   ======================================================= */
+
+/**
+ * deleteItemByName(name)
+ * Finds an item in IndexedDB by name (case-insensitive)
+ * and permanently deletes it.
+ * Called by chatbot.js for voice-style delete commands.
+ *
+ * @param {string} name - Item name or partial name to match
+ * @returns {Promise<{success:boolean, message:string, item?:object}>}
+ */
+async function deleteItemByName(name) {
+
+  /* Validate input */
+  if (!name || !name.trim()) {
+    return {
+      success: false,
+      message: 'Item ka naam nahi diya. Example: delete Panadol'
+    };
+  }
+
+  const searchName = name.trim().toLowerCase();
+
+  try {
+    /* Load all items */
+    const allItems = await getAllData('items');
+
+    /* Find matching item — exact first, then partial */
+    let found = allItems.find(
+      i => (i.itemName || '').toLowerCase() === searchName
+    );
+
+    if (!found) {
+      found = allItems.find(
+        i => (i.itemName || '').toLowerCase().includes(searchName) ||
+          (i.itemCode || '').toLowerCase().includes(searchName)
+      );
+    }
+
+    /* Item not found */
+    if (!found) {
+      return {
+        success: false,
+        message: `"${name}" inventory mein nahi mila. Sahi naam likhein.`
+      };
+    }
+
+    /* Delete from IndexedDB */
+    await deleteData('items', Number(found.id));
+
+    /* Refresh table if on inventory page */
+    if (typeof loadItems === 'function') {
+      await loadItems();
+    }
+
+    return {
+      success: true,
+      message: `✅ "${found.itemName}" delete ho gaya.`,
+      item: found
+    };
+
+  } catch (err) {
+    console.error('[Inventory] deleteItemByName error:', err);
+    return {
+      success: false,
+      message: 'Delete nahi hua: ' + err.message
+    };
+  }
+}

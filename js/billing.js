@@ -237,17 +237,19 @@ function renderBillTable() {
 }
 
 /* =======================================================
-   CALCULATE TOTALS
+   2. REPLACE recalculateTotals() in billing.js
+      with this version (adds CSS balance classes)
    ======================================================= */
 function recalculateTotals() {
   const subtotal = currentBillItems.reduce((sum, i) => sum + i.amount, 0);
-  const taxRate = parseFloat(billSettings.taxRate || 17);
+  const taxRate = parseFloat(billSettings?.taxRate || 17);
   const taxAmount = parseFloat((subtotal * taxRate / 100).toFixed(2));
   const discount = parseFloat(document.getElementById('discount')?.value || '0') || 0;
   const grandTotal = parseFloat(Math.max(0, subtotal + taxAmount - discount).toFixed(2));
   const cashPaid = parseFloat(document.getElementById('cash-received')?.value || '0') || 0;
   const balance = parseFloat((cashPaid - grandTotal).toFixed(2));
 
+  /* Update text values */
   setT('total-subtotal', subtotal.toFixed(2));
   setT('total-tax', taxAmount.toFixed(2));
   setT('total-discount', discount.toFixed(2));
@@ -255,11 +257,16 @@ function recalculateTotals() {
   setT('total-cash', cashPaid.toFixed(2));
   setT('total-balance', balance.toFixed(2));
 
-  // Color balance
-  const balEl = document.getElementById('total-balance');
-  if (balEl) {
-    balEl.style.color = balance < 0 ? '#dc2626' : '#16a34a';
+  /* Apply CSS class for balance color — no inline styles */
+  const balSpan = document.getElementById('total-balance');
+  if (balSpan) {
+    balSpan.classList.remove('balance-positive', 'balance-negative');
+    balSpan.classList.add(balance < 0 ? 'balance-negative' : 'balance-positive');
   }
+
+  /* Update tax label to show actual rate */
+  const taxLabel = document.querySelector('.invoice-tax-label');
+  if (taxLabel) taxLabel.textContent = `Tax (${taxRate}%):`;
 }
 
 /* =======================================================

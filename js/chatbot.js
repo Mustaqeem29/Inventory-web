@@ -49,9 +49,25 @@ const INTENT = {
     help: [
         'help', 'madad', 'kya kar sakta', 'commands', 'kya likhu',
         'guide', 'how to', 'kaise', 'instructions', 'batao'
-    ]
+    ],
+
+    deleteItem: [
+        'delete', 'remove', 'hatao', 'delete karo', 'item hatao',
+        'remove item', 'item delete karo', 'mitao', 'item mitao',
+        'delete item', 'item remove karo', 'band karo'
+    ],
 
 };
+
+
+/**
+ * chatbotState
+ * Tracks multi-step conversations (like delete confirmation).
+ */
+const chatbotState = {
+    pendingDelete: null  // Holds item waiting for yes/no confirmation
+};
+
 
 /* =======================================================
    DETECT INTENT
@@ -246,6 +262,22 @@ function parseSearchItem(input) {
 
     if (!nameText) {
         return { error: 'Item ka naam likhein. Example: find item Gloves' };
+    }
+
+    return { searchName: nameText };
+}
+
+/* =======================================================
+   DELETE ITEM PARSER
+   ======================================================= */
+function parseDeleteItem(input) {
+    // Remove intent keywords
+    const nameText = input
+        .replace(/delete|remove|hatao|delete karo|item hatao|remove item|item delete karo|mitao|item mitao|item remove karo|band karo/gi, '')
+        .trim();
+
+    if (!nameText) {
+        return { error: 'Item ka naam likhein. Example: delete item Gloves' };
     }
 
     return { searchName: nameText };
@@ -507,6 +539,65 @@ async function handleSearchItem(parsed) {
 }
 
 /**
+ * handleDeleteItem(parsed)
+ * Confirms with user then deletes item from IndexedDB.
+ * Uses deleteItemByName() from inventory.js.
+ *
+ * @param {object} parsed - { itemName } or { error }
+ */
+async function handleDeleteItem(parsed) {
+
+    /* Check for parse error */
+    if (parsed.error) {
+        botReply(parsed.error, 'error');
+        return;
+    }
+
+    const name = parsed.itemName.trim();
+
+    /* Verify item exists first */
+    let found = null;
+    try {
+        const allItems = await getAllData('items');
+        found = allItems.find(
+            i => (i.itemName || '').toLowerCase() === name.toLowerCase()
+        );
+        if (!found) {
+            found = allItems.find(
+                i => (i.itemName || '').toLowerCase().includes(name.toLowerCase()) ||
+                    (i.itemCode || '').toLowerCase().includes(name.toLowerCase())
+            );
+        }
+    } catch (err) {
+        botReply('❌ Database error: ' + err.message, 'error');
+        return;
+    }
+
+    /* Item not found */
+    if (!found) {
+        botReply(
+            `❌ "${name}" nahi mila inventory mein.\n` +
+            `Sahi naam ke liye "find item ${name}" type karein.`,
+            'error'
+        );
+        return;
+    }
+
+    /* Ask for confirmation via chatbot */
+    botReply(
+        `⚠️ Sure ho?\n` +
+        `Item: ${found.itemName} (${found.itemCode})\n` +
+        `Stock: ${found.currentStock} units\n\n` +
+        `Confirm karne ke liye "yes" type karein.\n` +
+        `Cancel ke liye "no" type karein.`,
+        'warning'
+    );
+
+    /* Set pending delete state */
+    chatbotState.pendingDelete = found;
+}
+
+/**
  * handleShowStock()
  * Shows summary of all inventory items.
  */
@@ -551,27 +642,70 @@ function handleHelp() {
         `📦 Stock Update:\n  update stock Gloves quantity 50\n\n` +
         `🧾 Bill Banao:\n  bill banao customer Ahmed item Gloves qty 5\n\n` +
         `🔍 Item Dhundo:\n  find item Gloves\n\n` +
+        `🗑️ Item Delete:\n  delete Panadol\n  Panadol delete karo\n\n` +
         `📋 Sab Items Dekho:\n  show stock`,
         'info'
     );
 }
 
 /* =======================================================
-   MAIN MESSAGE PROCESSOR
+   STEP 5 — REPLACE processMessage() with this version
+   This adds deleteItem case + yes/no confirmation flow
    ======================================================= */
 
 /**
  * processMessage(input)
  * Entry point — detects intent and calls correct handler.
+ * Also handles yes/no confirmation for pending actions.
  * @param {string} input - User message
  */
 async function processMessage(input) {
     const text = input.trim();
     if (!text) return;
 
+    /* ---- Handle YES/NO confirmation for pending delete ---- */
+    if (chatbotState.pendingDelete) {
+        const answer = text.toLowerCase();
+
+        if (answer === 'yes' || answer === 'haan' || answer === 'ha' || answer === 'y') {
+            const item = chatbotState.pendingDelete;
+            chatbotState.pendingDelete = null;
+
+            /* Call deleteItemByName from inventory.js */
+            if (typeof deleteItemByName === 'function') {
+                const result = await deleteItemByName(item.itemName);
+                botReply(result.message, result.success ? 'success' : 'error');
+            } else {
+                /* Fallback: delete directly from db.js */
+                try {
+                    await deleteData('items', Number(item.id));
+                    botReply(`✅ "${item.itemName}" delete ho gaya.`, 'success');
+                    if (typeof loadItems === 'function') loadItems();
+                } catch (err) {
+                    botReply('❌ Delete nahi hua: ' + err.message, 'error');
+                }
+            }
+            return;
+
+        } else if (answer === 'no' || answer === 'nahi' || answer === 'na' || answer === 'n') {
+            chatbotState.pendingDelete = null;
+            botReply('👍 Delete cancel ho gaya.', 'info');
+            return;
+
+        } else {
+            botReply(
+                '⚠️ Sirf "yes" ya "no" type karein delete confirm karne ke liye.',
+                'warning'
+            );
+            return;
+        }
+    }
+
+    /* ---- Normal intent detection ---- */
     const intent = detectIntent(text);
 
     switch (intent) {
+
         case 'addItem':
             await handleAddItem(parseAddItem(text));
             break;
@@ -592,14 +726,17 @@ async function processMessage(input) {
             await handleShowStock();
             break;
 
+        case 'deleteItem':                           /* ← NEW */
+            await handleDeleteItem(parseDeleteItem(text));
+            break;
+
         case 'help':
             handleHelp();
             break;
 
         default:
             botReply(
-                `🤔 Samajh nahi aaya.\n` +
-                `"help" type karein commands dekhne ke liye.`,
+                `🤔 Samajh nahi aaya.\n"help" type karein commands dekhne ke liye.`,
                 'warning'
             );
     }
