@@ -57,6 +57,12 @@ const INTENT = {
         'delete item', 'item remove karo', 'band karo'
     ],
 
+    showBills: [
+        'show bills', 'bills dekho', 'bills batao', 'all bills',
+        'sab bills', 'bills list', 'invoice list', 'bills dikhao',
+        'recent bills', 'purane bills'
+    ],
+
 };
 
 
@@ -271,13 +277,15 @@ function parseSearchItem(input) {
    DELETE ITEM PARSER
    ======================================================= */
 function parseDeleteItem(input) {
-    // Remove intent keywords
+    // Remove intent keywords and the word 'item' to isolate the name
     const nameText = input
-        .replace(/delete|remove|hatao|delete karo|item hatao|remove item|item delete karo|mitao|item mitao|item remove karo|band karo/gi, '')
+        .replace(/delete karo|item hatao|item delete karo|item mitao|item remove karo|band karo|remove item/gi, '')
+        .replace(/\bdelete\b|\bremove\b|\bhatao\b|\bmitao\b|\bitem\b/gi, '')
+        .replace(/\s+/g, ' ')
         .trim();
 
     if (!nameText) {
-        return { error: 'Item ka naam likhein. Example: delete item Gloves' };
+        return { error: 'Item ka naam likhein. Example: delete Gloves' };
     }
 
     return { searchName: nameText };
@@ -553,7 +561,13 @@ async function handleDeleteItem(parsed) {
         return;
     }
 
-    const name = parsed.itemName.trim();
+    // Support both searchName (from parser) and itemName (legacy)
+    const name = (parsed.searchName || parsed.itemName || '').trim();
+
+    if (!name) {
+        botReply('Item ka naam likhein. Example: delete Gloves', 'error');
+        return;
+    }
 
     /* Verify item exists first */
     let found = null;
@@ -595,6 +609,39 @@ async function handleDeleteItem(parsed) {
 
     /* Set pending delete state */
     chatbotState.pendingDelete = found;
+}
+
+/**
+ * handleShowBills()
+ * Shows recent bills from the database.
+ */
+async function handleShowBills() {
+    try {
+        const allBills = await getAllData('bills');
+
+        if (allBills.length === 0) {
+            botReply('📋 Koi bill nahi mila. Pehle bill banao.', 'info');
+            return;
+        }
+
+        // Sort by invoice number descending (newest first)
+        allBills.sort((a, b) => (parseInt(b.invoiceNumber) || 0) - (parseInt(a.invoiceNumber) || 0));
+
+        const recent = allBills.slice(0, 6);
+        const lines = recent.map(b =>
+            `• ${b.billNumber} | ${b.customerName || 'Walk-in'} | Rs.${parseFloat(b.grandTotal || 0).toFixed(2)} | ${b.date || '---'}`
+        ).join('\n');
+
+        botReply(
+            `📋 Bills (${allBills.length} total):\n${lines}` +
+            (allBills.length > 6 ? `\n...aur ${allBills.length - 6} aur bills` : '') +
+            `\n\nSab bills dekhne ke liye bills.html visit karein.`,
+            'info'
+        );
+
+    } catch (err) {
+        botReply('❌ Bills load nahi hue: ' + err.message, 'error');
+    }
 }
 
 /**
@@ -642,8 +689,9 @@ function handleHelp() {
         `📦 Stock Update:\n  update stock Gloves quantity 50\n\n` +
         `🧾 Bill Banao:\n  bill banao customer Ahmed item Gloves qty 5\n\n` +
         `🔍 Item Dhundo:\n  find item Gloves\n\n` +
-        `🗑️ Item Delete:\n  delete Panadol\n  Panadol delete karo\n\n` +
-        `📋 Sab Items Dekho:\n  show stock`,
+        `🗑️ Item Delete:\n  delete Panadol\n  Panadol delete karo\n  delete MULTIONE-6392\n\n` +
+        `📋 Sab Items Dekho:\n  show stock\n\n` +
+        `🧾 Bills Dekho:\n  show bills\n  bills dekho`,
         'info'
     );
 }
@@ -671,19 +719,14 @@ async function processMessage(input) {
             const item = chatbotState.pendingDelete;
             chatbotState.pendingDelete = null;
 
-            /* Call deleteItemByName from inventory.js */
-            if (typeof deleteItemByName === 'function') {
-                const result = await deleteItemByName(item.itemName);
-                botReply(result.message, result.success ? 'success' : 'error');
-            } else {
-                /* Fallback: delete directly from db.js */
-                try {
-                    await deleteData('items', Number(item.id));
-                    botReply(`✅ "${item.itemName}" delete ho gaya.`, 'success');
-                    if (typeof loadItems === 'function') loadItems();
-                } catch (err) {
-                    botReply('❌ Delete nahi hua: ' + err.message, 'error');
-                }
+            /* Always use direct DB delete — reliable across all pages */
+            try {
+                await deleteData('items', Number(item.id));
+                botReply(`✅ "${item.itemName}" delete ho gaya!`, 'success');
+                // Refresh table if on inventory page
+                if (typeof loadItems === 'function') await loadItems();
+            } catch (err) {
+                botReply('❌ Delete nahi hua: ' + err.message, 'error');
             }
             return;
 
@@ -726,8 +769,12 @@ async function processMessage(input) {
             await handleShowStock();
             break;
 
-        case 'deleteItem':                           /* ← NEW */
+        case 'deleteItem':
             await handleDeleteItem(parseDeleteItem(text));
+            break;
+
+        case 'showBills':
+            await handleShowBills();
             break;
 
         case 'help':

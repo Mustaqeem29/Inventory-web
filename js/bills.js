@@ -214,11 +214,11 @@ async function viewBillDetails(id) {
         // Build items rows
         const itemRows = (bill.items || []).map((item, i) => `
       <tr>
-        <td>${i + 1}</td>
-        <td>${escHtmlBl(item.itemName)}</td>
-        <td>${item.rate?.toFixed(2)}</td>
-        <td>${item.qty}</td>
-        <td><strong>${item.amount?.toFixed(2)}</strong></td>
+        <td style="padding:8px;color:#1e293b;border-bottom:1px solid #e2e8f0;vertical-align:middle;">${i + 1}</td>
+        <td style="padding:8px;color:#1e293b;border-bottom:1px solid #e2e8f0;vertical-align:middle;font-weight:500;">${escHtmlBl(item.itemName)}</td>
+        <td style="padding:8px;color:#1e293b;border-bottom:1px solid #e2e8f0;vertical-align:middle;">${item.rate?.toFixed(2)}</td>
+        <td style="padding:8px;color:#1e293b;border-bottom:1px solid #e2e8f0;vertical-align:middle;">${item.qty}</td>
+        <td style="padding:8px;color:#1e293b;border-bottom:1px solid #e2e8f0;vertical-align:middle;"><strong style="color:#0f172a;">${item.amount?.toFixed(2)}</strong></td>
       </tr>`
         ).join('');
 
@@ -263,72 +263,72 @@ async function viewBillDetails(id) {
 
             <!-- Bill Info -->
             <div style="display:flex;justify-content:space-between;
-              flex-wrap:wrap;gap:12px;margin-bottom:16px;font-size:13px;">
-              <div>
-                <p><strong>Invoice:</strong> ${prefix}${bill.invoiceNumber}</p>
-                <p><strong>Date:</strong> ${formatDate(bill.date)}</p>
-                <p><strong>Seller:</strong> ${escHtmlBl(bill.sellerName || '---')}</p>
+              flex-wrap:wrap;gap:12px;margin-bottom:16px;font-size:13px;color:#1e293b;">
+              <div style="line-height:1.8;">
+                <p style="margin:0 0 4px 0;color:#1e293b;"><strong style="color:#334155;">Invoice:</strong> ${prefix}${bill.invoiceNumber}</p>
+                <p style="margin:0 0 4px 0;color:#1e293b;"><strong style="color:#334155;">Date:</strong> ${formatDate(bill.date)}</p>
+                <p style="margin:0;color:#1e293b;"><strong style="color:#334155;">Seller:</strong> ${escHtmlBl(bill.sellerName || '---')}</p>
               </div>
-              <div>
-                <p><strong>Customer:</strong>
+              <div style="line-height:1.8;">
+                <p style="margin:0 0 4px 0;color:#1e293b;"><strong style="color:#334155;">Customer:</strong>
                   ${escHtmlBl(bill.customerName || 'Walk-in Customer')}</p>
-                <p><strong>Phone:</strong>
+                <p style="margin:0;color:#1e293b;"><strong style="color:#334155;">Phone:</strong>
                   ${escHtmlBl(bill.customerPhone || '---')}</p>
               </div>
             </div>
 
             <!-- Items Table -->
             <table style="width:100%;border-collapse:collapse;font-size:13px;
-              margin-bottom:16px;">
+              margin-bottom:16px;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden;">
               <thead>
                 <tr style="background:#f1f5f9;">
-                  <th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0;">#</th>
-                  <th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0;">Item</th>
-                  <th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0;">Rate</th>
-                  <th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0;">Qty</th>
-                  <th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0;">Amount</th>
+                  <th style="padding:10px 8px;text-align:left;border-bottom:2px solid #e2e8f0;color:#334155;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">#</th>
+                  <th style="padding:10px 8px;text-align:left;border-bottom:2px solid #e2e8f0;color:#334155;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Item</th>
+                  <th style="padding:10px 8px;text-align:left;border-bottom:2px solid #e2e8f0;color:#334155;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Rate</th>
+                  <th style="padding:10px 8px;text-align:left;border-bottom:2px solid #e2e8f0;color:#334155;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Qty</th>
+                  <th style="padding:10px 8px;text-align:left;border-bottom:2px solid #e2e8f0;color:#334155;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Amount</th>
                 </tr>
               </thead>
               <tbody>${itemRows}</tbody>
             </table>
 
             <!-- Totals -->
-            <table style="width:100%;font-size:13px;border-collapse:collapse;">
+            <table style="width:100%;font-size:13px;border-collapse:collapse;border-top:2px dashed #e2e8f0;margin-top:4px;">
               <tr>
-                <td style="padding:4px 8px;color:#64748b;font-weight:600;
+                <td style="padding:7px 12px;color:#64748b;font-weight:600;
                   text-align:right;width:60%;">Subtotal:</td>
-                <td style="padding:4px 8px;text-align:right;">
+                <td style="padding:7px 12px;text-align:right;color:#1e293b;font-weight:500;">
                   ${formatCurrency(bill.subtotal)}</td>
               </tr>
               <tr>
-                <td style="padding:4px 8px;color:#64748b;font-weight:600;
+                <td style="padding:7px 12px;color:#64748b;font-weight:600;
                   text-align:right;">Tax (${bill.taxRate || 17}%):</td>
-                <td style="padding:4px 8px;text-align:right;">
+                <td style="padding:7px 12px;text-align:right;color:#1e293b;font-weight:500;">
                   ${formatCurrency(bill.taxAmount)}</td>
               </tr>
               <tr>
-                <td style="padding:4px 8px;color:#64748b;font-weight:600;
+                <td style="padding:7px 12px;color:#64748b;font-weight:600;
                   text-align:right;">Discount:</td>
-                <td style="padding:4px 8px;text-align:right;">
+                <td style="padding:7px 12px;text-align:right;color:#1e293b;font-weight:500;">
                   ${formatCurrency(bill.discount)}</td>
               </tr>
-              <tr style="background:#f0fdf4;">
-                <td style="padding:8px;font-size:15px;font-weight:800;
-                  text-align:right;">Grand Total:</td>
-                <td style="padding:8px;font-size:15px;font-weight:800;
+              <tr style="background:#f0fdf4;border-radius:6px;">
+                <td style="padding:10px 12px;font-size:15px;font-weight:800;
+                  text-align:right;color:#0f172a;">Grand Total:</td>
+                <td style="padding:10px 12px;font-size:15px;font-weight:800;
                   text-align:right;color:#16a34a;">
                   ${formatCurrency(bill.grandTotal)}</td>
               </tr>
               <tr>
-                <td style="padding:4px 8px;color:#64748b;font-weight:600;
+                <td style="padding:7px 12px;color:#64748b;font-weight:600;
                   text-align:right;">Cash Received:</td>
-                <td style="padding:4px 8px;text-align:right;">
+                <td style="padding:7px 12px;text-align:right;color:#1e293b;font-weight:500;">
                   ${formatCurrency(bill.cashPaid)}</td>
               </tr>
               <tr>
-                <td style="padding:4px 8px;color:#64748b;font-weight:600;
+                <td style="padding:7px 12px;color:#64748b;font-weight:600;
                   text-align:right;">Balance:</td>
-                <td style="padding:4px 8px;text-align:right;
+                <td style="padding:7px 12px;text-align:right;font-weight:600;
                   color:${bill.balance < 0 ? '#dc2626' : '#16a34a'}">
                   ${formatCurrency(bill.balance)}</td>
               </tr>
