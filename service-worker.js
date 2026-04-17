@@ -30,7 +30,7 @@
                  delete the old cache automatically.
    FILES       : Every file the app needs to run offline.
 ----------------------------------------------------- */
-const CACHE_NAME = 'khuwaja-surgical-cache-v1';
+const CACHE_NAME = 'khuwaja-surgical-cache-v5';
 
 const FILES_TO_CACHE = [
 
@@ -62,7 +62,8 @@ const FILES_TO_CACHE = [
     './js/bills.js',
     './js/settings.js',
     './js/print.js',
-    './js/backup.js'
+    './js/backup.js',
+    './js/chatbot.js'
 
 ];
 
@@ -160,16 +161,15 @@ self.addEventListener('activate', function (event) {
 
 
 /* =====================================================
-   FETCH EVENT  —  Cache-First Strategy
+   FETCH EVENT  —  Network-First Strategy
    -------------------------------------------------------
    Fires on every network request the app makes.
 
-   Cache-First Strategy:
-     1. Check the cache first
-     2. If found → return the cached file immediately (fast + offline)
-     3. If NOT found → try the network
-     4. If network succeeds → save a copy in cache, return response
-     5. If network fails AND not in cache → show offline page
+   Network-First Strategy:
+     1. Try the network first
+     2. If network succeeds → save a copy in cache, return response
+     3. If network fails → check the cache
+     4. If not in cache → show offline page
    ===================================================== */
 self.addEventListener('fetch', function (event) {
 
@@ -182,76 +182,37 @@ self.addEventListener('fetch', function (event) {
 
     event.respondWith(
 
-        /* Step 1: Check the cache */
-        caches.match(event.request)
-            .then(function (cachedResponse) {
+        /* Step 1: Try the network first */
+        fetch(event.request)
+            .then(function (networkResponse) {
 
-                /* Step 2: Cache HIT — return the cached file */
-                if (cachedResponse) {
-                    console.log('[SW] Serving from cache:', event.request.url);
-                    return cachedResponse;
-                }
-
-                /* Step 3: Cache MISS — fetch from the network */
-                console.log('[SW] Not in cache, fetching from network:', event.request.url);
-
-                return fetch(event.request)
-                    .then(function (networkResponse) {
-
-                        /*
-                          Only cache valid successful responses.
-                          status 200 = OK
-                          type 'basic' = same-origin request
-                        */
-                        if (
-                            !networkResponse ||
-                            networkResponse.status !== 200 ||
-                            networkResponse.type !== 'basic'
-                        ) {
-                            return networkResponse;
-                        }
-
-                        /* Step 4: Save a copy in cache for next time */
-                        /*
-                          We must clone the response because a Response
-                          object can only be read/consumed once.
-                          One copy goes to the cache, one goes to the browser.
-                        */
-                        const responseToCache = networkResponse.clone();
-
-                        caches.open(CACHE_NAME)
-                            .then(function (cache) {
-                                cache.put(event.request, responseToCache);
-                                console.log('[SW] Saved new file to cache:', event.request.url);
-                            });
-
-                        return networkResponse;
-
-                    })
-                    .catch(function () {
-
-                        /*
-                          Step 5: Network failed AND file not in cache.
-                          Show the offline fallback page for HTML requests.
-                        */
-                        const acceptHeader = event.request.headers.get('Accept') || '';
-
-                        if (acceptHeader.includes('text/html')) {
-                            console.log('[SW] Offline and not cached. Showing offline page.');
-                            return caches.match('./offline.html');
-                        }
-
-                        /*
-                          For non-HTML files (JS, CSS) return an empty
-                          response rather than an error so the page
-                          does not completely break.
-                        */
-                        return new Response('', {
-                            status: 503,
-                            statusText: 'Service Unavailable — Offline'
-                        });
-
+                /* Step 2: Network success — update cache and return */
+                if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+                    const responseToCache = networkResponse.clone();
+                    caches.open(CACHE_NAME).then(function (cache) {
+                        cache.put(event.request, responseToCache);
                     });
+                }
+                return networkResponse;
+
+            })
+            .catch(function () {
+
+                /* Step 3: Network failed — check the cache */
+                return caches.match(event.request).then(function (cachedResponse) {
+                    if (cachedResponse) return cachedResponse;
+
+                    /* Step 4: Not in cache — show offline page for HTML */
+                    const acceptHeader = event.request.headers.get('Accept') || '';
+                    if (acceptHeader.includes('text/html')) {
+                        return caches.match('./offline.html');
+                    }
+
+                    return new Response('', {
+                        status: 503,
+                        statusText: 'Service Unavailable — Offline'
+                    });
+                });
 
             })
 
