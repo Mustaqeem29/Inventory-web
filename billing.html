@@ -1,53 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>New Bill - Khuwaja Surgical</title>
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/dark-mode.css" id="dark-mode-css" disabled>
   <link rel="stylesheet" href="css/print.css" media="print">
 </head>
-
 <body>
-
-  <!-- ===== BILLING PAGE ===== -->
-
-  <!-- Sidebar (hidden on print) -->
   <aside class="sidebar no-print" id="sidebar">
     <div class="sidebar-brand">
-      <span class="brand-icon-sm">🏥</span>
+      <div class="brand-icon-sm"><svg width="18" height="18" fill="none" stroke="#4ade80" stroke-width="2" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div>
       <span>Khuwaja Surgical</span>
     </div>
     <nav class="sidebar-nav">
-      <a href="dashboard.html" class="nav-link">
-        <span class="nav-icon">📊</span> Dashboard
-      </a>
-      <a href="inventory.html" class="nav-link">
-        <span class="nav-icon">📦</span> Inventory
-      </a>
-      <a href="billing.html" class="nav-link active">
-        <span class="nav-icon">🧾</span> New Bill
-      </a>
-      <a href="bills.html" class="nav-link">
-        <span class="nav-icon">📋</span> Bills
-      </a>
-      <a href="settings.html" class="nav-link">
-        <span class="nav-icon">⚙️</span> Settings
-      </a>
+      <a href="dashboard.html" class="nav-link"><span class="nav-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Dashboard</a>
+      <a href="inventory.html" class="nav-link"><span class="nav-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span>Inventory</a>
+      <a href="billing.html" class="nav-link active"><span class="nav-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>New Bill</a>
+      <a href="bills.html" class="nav-link"><span class="nav-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>Bills</a>
+      <a href="settings.html" class="nav-link"><span class="nav-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></span>Settings</a>
     </nav>
     <div class="sidebar-footer">
-      <a href="login.html" class="nav-link logout-link">
-        <span class="nav-icon">🚪</span> Logout
-      </a>
+      <a href="login.html" class="nav-link logout-link"><span class="nav-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>Logout</a>
     </div>
   </aside>
 
-  <!-- Main Wrapper -->
   <div class="main-wrapper">
-
-    <!-- Header (hidden on print) -->
     <header class="top-header no-print">
       <button class="menu-toggle" id="menu-toggle">☰</button>
       <div class="header-title">Create New Bill</div>
@@ -56,65 +34,38 @@
         <div class="user-badge">Admin</div>
       </div>
     </header>
-
-    <!-- Page Content -->
     <main class="page-content">
-
-      <!-- ===== INVOICE / RECEIPT ===== -->
       <div class="invoice-wrapper" id="invoice-print-area">
-
-        <!-- INVOICE HEADER (visible on screen and print) -->
         <div class="invoice-header">
           <div class="invoice-brand">
-            <h2 class="invoice-shop-name">🏥 Khuwaja Surgical</h2>
+            <h2 class="invoice-shop-name">Khuwaja Surgical</h2>
             <p class="invoice-address">Main Bazar, Sukkur, Sindh | Ph: 0300-1234567</p>
           </div>
           <div class="invoice-meta">
-            <div class="meta-row">
-              <span class="meta-label">Invoice No:</span>
-              <span class="meta-value" id="inv-number">#1043</span>
-            </div>
-            <div class="meta-row">
-              <span class="meta-label">Date:</span>
-              <span class="meta-value" id="inv-date">11-03-2026</span>
-            </div>
+            <div class="meta-row"><span class="meta-label">Invoice No:</span><span class="meta-value" id="inv-number">#1043</span></div>
+            <div class="meta-row"><span class="meta-label">Date:</span><span class="meta-value" id="inv-date">11-03-2026</span></div>
           </div>
         </div>
 
-        <!-- SELLER & CUSTOMER INFO -->
         <div class="invoice-parties no-print">
           <div class="party-block">
             <h4 class="party-label">Seller Information</h4>
-            <div class="form-group">
-              <label for="seller-name">Seller Name</label>
-              <input type="text" id="seller-name" name="seller_name" placeholder="Seller / Staff Name" value="Admin">
-            </div>
+            <div class="form-group"><label for="seller-name">Seller Name</label><input type="text" id="seller-name" name="seller_name" placeholder="Seller / Staff Name" value="Admin"></div>
           </div>
           <div class="party-block">
             <h4 class="party-label">Customer Information</h4>
             <div class="form-row">
-              <div class="form-group">
-                <label for="cust-name">Customer Name</label>
-                <input type="text" id="cust-name" name="customer_name" placeholder="Customer / Shop Name">
-              </div>
-              <div class="form-group">
-                <label for="cust-phone">Phone Number</label>
-                <input type="text" id="cust-phone" name="customer_phone" placeholder="0300-0000000">
-              </div>
+              <div class="form-group"><label for="cust-name">Customer Name</label><input type="text" id="cust-name" name="customer_name" placeholder="Customer / Shop Name"></div>
+              <div class="form-group"><label for="cust-phone">Phone Number</label><input type="text" id="cust-phone" name="customer_phone" placeholder="0300-0000000"></div>
             </div>
           </div>
         </div>
 
-        <!-- PRINT-ONLY PARTY INFO -->
         <div class="print-only party-print-row">
-          <div>
-            <strong>Seller:</strong> Admin &nbsp;&nbsp;
-            <strong>Customer:</strong> Walk-in Customer
-          </div>
+          <div><strong>Seller:</strong> Admin &nbsp;&nbsp;<strong>Customer:</strong> Walk-in Customer</div>
           <div><strong>Phone:</strong> ---</div>
         </div>
 
-        <!-- ADD ITEM ROW (hidden on print) -->
         <div class="add-item-row no-print">
           <h4 class="party-label">Add Item to Bill</h4>
           <div class="form-row item-add-form">
@@ -122,163 +73,63 @@
               <label for="item-select">Select Item</label>
               <select id="item-select" name="item_select">
                 <option value="">-- Choose Item --</option>
-                <option value="surgical-gloves|500|SRG-001">
-                  Surgical Gloves (M) — Rs.500
-                </option>
-                <option value="syringe-5ml|20|SRG-045">
-                  Disposable Syringe 5ml — Rs.20
-                </option>
-                <option value="cotton-bandage|70|SRG-102">
-                  Cotton Bandage 4" — Rs.70
-                </option>
-                <option value="stethoscope|1200|SRG-200">
-                  Stethoscope — Rs.1,200
-                </option>
-                <option value="oxygen-mask|150|SRG-311">
-                  Oxygen Mask (Adult) — Rs.150
-                </option>
+                <option value="surgical-gloves|500|SRG-001">Surgical Gloves (M) — Rs.500</option>
+                <option value="syringe-5ml|20|SRG-045">Disposable Syringe 5ml — Rs.20</option>
+                <option value="cotton-bandage|70|SRG-102">Cotton Bandage 4" — Rs.70</option>
+                <option value="stethoscope|1200|SRG-200">Stethoscope — Rs.1,200</option>
+                <option value="oxygen-mask|150|SRG-311">Oxygen Mask (Adult) — Rs.150</option>
               </select>
             </div>
-            <div class="form-group form-group-sm">
-              <label for="item-qty">Quantity</label>
-              <input type="number" id="item-qty" name="quantity" placeholder="1" min="1" value="1">
-            </div>
-            <div class="form-group form-group-sm">
-              <label for="item-rate">Rate (Rs.)</label>
-              <input type="number" id="item-rate" name="rate" placeholder="0.00" step="0.01">
-            </div>
-            <div class="form-group form-group-btn">
-              <label>&nbsp;</label>
-              <button type="button" class="btn btn-primary">➕ Add Item</button>
-            </div>
+            <div class="form-group form-group-sm"><label for="item-qty">Quantity</label><input type="number" id="item-qty" name="quantity" placeholder="1" min="1" value="1"></div>
+            <div class="form-group form-group-sm"><label for="item-rate">Rate (Rs.)</label><input type="number" id="item-rate" name="rate" placeholder="0.00" step="0.01"></div>
+            <div class="form-group form-group-btn"><label>&nbsp;</label><button type="button" class="btn btn-primary">+ Add Item</button></div>
           </div>
         </div>
 
-        <!-- ITEMS TABLE -->
         <div class="invoice-items">
           <table class="data-table invoice-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Item Name</th>
-                <th>Rate (Rs.)</th>
-                <th>Quantity</th>
-                <th>Amount (Rs.)</th>
-                <th class="no-print">Remove</th>
-              </tr>
-            </thead>
+            <thead><tr><th>#</th><th>Item Name</th><th>Rate (Rs.)</th><th>Quantity</th><th>Amount (Rs.)</th><th class="no-print">Remove</th></tr></thead>
             <tbody id="invoice-items-body">
-              <!-- Sample rows -->
-              <tr>
-                <td>1</td>
-                <td>Surgical Gloves (M)</td>
-                <td>500.00</td>
-                <td>10</td>
-                <td>5,000.00</td>
-                <td class="no-print">
-                  <button class="btn-icon btn-delete">🗑️</button>
-                </td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>Disposable Syringe 5ml</td>
-                <td>20.00</td>
-                <td>50</td>
-                <td>1,000.00</td>
-                <td class="no-print">
-                  <button class="btn-icon btn-delete">🗑️</button>
-                </td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>Cotton Bandage 4"</td>
-                <td>70.00</td>
-                <td>20</td>
-                <td>1,400.00</td>
-                <td class="no-print">
-                  <button class="btn-icon btn-delete">🗑️</button>
-                </td>
-              </tr>
+              <tr><td>1</td><td>Surgical Gloves (M)</td><td>500.00</td><td>10</td><td>5,000.00</td><td class="no-print"><button class="btn-delete-item">Remove</button></td></tr>
+              <tr><td>2</td><td>Disposable Syringe 5ml</td><td>20.00</td><td>50</td><td>1,000.00</td><td class="no-print"><button class="btn-delete-item">Remove</button></td></tr>
+              <tr><td>3</td><td>Cotton Bandage 4"</td><td>70.00</td><td>20</td><td>1,400.00</td><td class="no-print"><button class="btn-delete-item">Remove</button></td></tr>
             </tbody>
           </table>
         </div>
 
-        <!-- TOTALS SECTION -->
         <div class="invoice-totals">
           <div class="totals-left no-print">
-            <div class="form-group">
-              <label for="cash-received">Cash Received (Rs.)</label>
-              <input type="number" id="cash-received" name="cash_received" placeholder="0.00" step="0.01">
-            </div>
+            <div class="form-group"><label for="cash-received">Cash Received (Rs.)</label><input type="number" id="cash-received" name="cash_received" placeholder="0.00" step="0.01"></div>
           </div>
           <div class="totals-right">
             <table class="totals-table">
-              <tr>
-                <td class="totals-label">Subtotal:</td>
-                <td class="totals-value">Rs. 7,400.00</td>
-              </tr>
-              <tr>
-                <td class="totals-label">Tax (17%):</td>
-                <td class="totals-value">Rs. 1,258.00</td>
-              </tr>
-              <tr>
-                <td class="totals-label">Discount:</td>
-                <td class="totals-value no-print">
-                  <input type="number" id="discount" placeholder="0" class="discount-input" step="0.01">
-                </td>
-                <td class="totals-value print-only">Rs. 0.00</td>
-              </tr>
-              <tr class="grand-total-row">
-                <td class="totals-label">Grand Total:</td>
-                <td class="totals-value grand-total-val">Rs. 8,658.00</td>
-              </tr>
-              <tr>
-                <td class="totals-label">Cash Received:</td>
-                <td class="totals-value">Rs. 10,000.00</td>
-              </tr>
-              <tr>
-                <td class="totals-label">Balance:</td>
-                <td class="totals-value balance-val">Rs. 1,342.00</td>
-              </tr>
+              <tr><td class="totals-label">Subtotal:</td><td class="totals-value">Rs. 7,400.00</td></tr>
+              <tr><td class="totals-label">Tax (17%):</td><td class="totals-value">Rs. 1,258.00</td></tr>
+              <tr><td class="totals-label">Discount:</td><td class="totals-value no-print"><input type="number" id="discount" placeholder="0" class="discount-input" step="0.01"></td><td class="totals-value print-only">Rs. 0.00</td></tr>
+              <tr class="grand-total-row"><td class="totals-label">Grand Total:</td><td class="totals-value grand-total-val">Rs. 8,658.00</td></tr>
+              <tr><td class="totals-label">Cash Received:</td><td class="totals-value">Rs. 10,000.00</td></tr>
+              <tr><td class="totals-label">Balance:</td><td class="totals-value balance-val">Rs. 1,342.00</td></tr>
             </table>
           </div>
         </div>
 
-        <!-- INVOICE FOOTER (visible on print) -->
         <div class="invoice-footer print-only">
           <p>Thank you for your business!</p>
           <p>Khuwaja Surgical | 0300-1234567</p>
         </div>
-
-      </div><!-- /#invoice-print-area -->
-
-      <!-- ACTION BUTTONS (hidden on print) -->
-      <div class="invoice-actions no-print">
-        <button type="button" class="btn btn-primary" onclick="window.print()">🖨️ Print Bill</button>
-        <button type="button" class="btn btn-green">💾 Save Bill</button>
-        <button type="button" class="btn btn-outline">🔄 Clear</button>
-        <a href="bills.html" class="btn btn-outline">📋 View All Bills</a>
       </div>
 
+      <div class="invoice-actions no-print">
+        <button type="button" class="btn btn-primary" onclick="window.print()">Print Bill</button>
+        <button type="button" class="btn btn-green">Save Bill</button>
+        <button type="button" class="btn btn-outline">Clear</button>
+        <a href="bills.html" class="btn btn-outline">View All Bills</a>
+      </div>
     </main>
   </div>
-  <script src="js/db.js"></script>
-  <script src="js/helpers.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/billing.js"></script>
-  <script src="js/print.js"></script>
-  <script src="js/backup.js"></script>
-  <script src="js/chatbot.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('SW: Registered ✓'))
-        .catch(err => console.error('SW: Failed -', err));
-    }
-  </script>
-
-
+  <script src="js/db.js"></script><script src="js/helpers.js"></script><script src="js/ui.js"></script>
+  <script src="js/auth.js"></script><script src="js/billing.js"></script><script src="js/print.js"></script>
+  <script src="js/backup.js"></script><script src="js/chatbot.js"></script>
+  <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js');</script>
 </body>
-
 </html>

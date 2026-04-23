@@ -6,11 +6,177 @@
 const DB_NAME = 'khuwajaInventoryDB';
 const DB_VERSION = 1;
 let db = null;
+const DB_SESSION_KEY = 'ksLoggedUser';
+const USER_LOCAL_STORES = {
+    items: { primary: 'products', aliases: ['inventory'] },
+    bills: { primary: 'bills', aliases: [] },
+    settings: { primary: 'settings', aliases: [] }
+};
 
 // ---- Promise that resolves when DB is ready ----
 // All other scripts wait for this before doing anything
 let dbReadyResolve;
 const dbReady = new Promise(resolve => { dbReadyResolve = resolve; });
+
+function isUserLocalStore(storeName) {
+    return Object.prototype.hasOwnProperty.call(USER_LOCAL_STORES, storeName);
+}
+
+function getSessionUserEmail() {
+    try {
+        const raw = sessionStorage.getItem(DB_SESSION_KEY);
+        if (!raw) return null;
+        const user = JSON.parse(raw);
+        return String(user?.email || '').trim().toLowerCase() || null;
+    } catch (err) {
+        console.warn('[DB] Could not read session user:', err.message);
+        return null;
+    }
+}
+
+function getScopedStorageKey(suffix, email = getSessionUserEmail()) {
+    if (!email) return null;
+    return `${email}_${suffix}`;
+}
+
+function getStoreStorageKeys(storeName, email = getSessionUserEmail()) {
+    const config = USER_LOCAL_STORES[storeName];
+    if (!config || !email) return [];
+    return [config.primary, ...(config.aliases || [])].map(alias => getScopedStorageKey(alias, email));
+}
+
+function readJSON(key, fallback) {
+    try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+    } catch (err) {
+        console.warn('[DB] Could not parse localStorage key:', key, err.message);
+        return fallback;
+    }
+}
+
+function writeJSON(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+}
+
+function getLocalStoreData(storeName, email = getSessionUserEmail()) {
+    const keys = getStoreStorageKeys(storeName, email);
+    if (keys.length === 0) return [];
+    return readJSON(keys[0], []);
+}
+
+function syncDerivedCustomers(email, bills = []) {
+    const customerKey = getScopedStorageKey('customers', email);
+    if (!customerKey) return;
+
+    const customers = bills
+        .filter(bill => (bill.customerName || '').trim())
+        .reduce((list, bill) => {
+            const customerName = String(bill.customerName || '').trim();
+            const customerPhone = String(bill.customerPhone || '').trim();
+            const exists = list.some(c =>
+                c.name.toLowerCase() === customerName.toLowerCase() &&
+                (c.phone || '') === customerPhone
+            );
+
+            if (!exists) {
+                list.push({
+                    id: list.length + 1,
+                    name: customerName,
+                    phone: customerPhone,
+                    lastBillDate: bill.date || bill.createdAt || ''
+                });
+            }
+
+            return list;
+        }, []);
+
+    writeJSON(customerKey, customers);
+}
+
+function saveLocalStoreData(storeName, records, email = getSessionUserEmail()) {
+    const keys = getStoreStorageKeys(storeName, email);
+    if (keys.length === 0) {
+        throw new Error(`No logged-in user found for ${storeName} storage.`);
+    }
+
+    keys.forEach(key => writeJSON(key, records));
+
+    if (storeName === 'bills') {
+        syncDerivedCustomers(email, records);
+    }
+
+    if (storeName === 'settings') {
+        const settings = records[0] || {};
+        const lowStockKey = getScopedStorageKey('lowStockLimit', email);
+        if (lowStockKey) {
+            localStorage.setItem(lowStockKey, String(settings.lowStockLimit ?? 10));
+        }
+    }
+}
+
+function getNextLocalId(records) {
+    const maxId = records.reduce((max, record) => Math.max(max, Number(record.id) || 0), 0);
+    return maxId + 1;
+}
+
+function getDefaultSettingsRecord() {
+    return {
+        businessName: 'Khuwaja Surgical',
+        address: 'Main Bazar, Sukkur, Sindh, Pakistan',
+        phone: '0300-1234567',
+        email: '',
+        taxRate: 17,
+        currency: 'PKR',
+        lowStockLimit: 10,
+        invoicePrefix: '#',
+        invoiceStart: 1001,
+        printWidth: '80mm',
+        showLogo: true,
+        showTax: true,
+        showFooter: true,
+        footerMsg: 'Thank you for your business! | Khuwaja Surgical'
+    };
+}
+
+function ensureCurrentUserScopedData() {
+    const email = getSessionUserEmail();
+    if (!email) return Promise.resolve();
+
+    const settings = getLocalStoreData('settings', email);
+    if (settings.length === 0) {
+        saveLocalStoreData('settings', [{
+            id: 1,
+            ...getDefaultSettingsRecord(),
+            userEmail: email,
+            createdAt: new Date().toISOString()
+        }], email);
+    }
+
+    if (getLocalStoreData('items', email).length === 0) {
+        saveLocalStoreData('items', [], email);
+    }
+
+    if (getLocalStoreData('bills', email).length === 0) {
+        saveLocalStoreData('bills', [], email);
+    }
+
+    const customersKey = getScopedStorageKey('customers', email);
+    if (customersKey && localStorage.getItem(customersKey) === null) {
+        writeJSON(customersKey, []);
+    }
+
+    return Promise.resolve();
+}
+
+function getCurrentLowStockLimit() {
+    const email = getSessionUserEmail();
+    const settings = getLocalStoreData('settings', email);
+    const fromSettings = settings[0]?.lowStockLimit;
+    const scopedKey = getScopedStorageKey('lowStockLimit', email);
+    const scopedValue = scopedKey ? localStorage.getItem(scopedKey) : null;
+    return parseInt(fromSettings || scopedValue || localStorage.getItem('ksLowStockLimit') || '10', 10);
+}
 
 /* -------------------------------------------------------
    openDatabase()
@@ -89,6 +255,28 @@ function openDatabase() {
 ------------------------------------------------------- */
 function addData(storeName, data) {
     return new Promise((resolve, reject) => {
+        if (isUserLocalStore(storeName)) {
+            try {
+                const email = getSessionUserEmail();
+                if (!email) throw new Error('Please log in first.');
+
+                const records = getLocalStoreData(storeName, email);
+                const record = {
+                    ...data,
+                    id: data.id ?? getNextLocalId(records),
+                    userEmail: email,
+                    createdAt: data.createdAt || new Date().toISOString()
+                };
+
+                records.push(record);
+                saveLocalStoreData(storeName, records, email);
+                resolve(record.id);
+            } catch (err) {
+                reject(err);
+            }
+            return;
+        }
+
         if (!db) { reject(new Error('DB not ready')); return; }
 
         const tx = db.transaction([storeName], 'readwrite');
@@ -119,6 +307,15 @@ function addData(storeName, data) {
 ------------------------------------------------------- */
 function getAllData(storeName) {
     return new Promise((resolve, reject) => {
+        if (isUserLocalStore(storeName)) {
+            try {
+                resolve(getLocalStoreData(storeName));
+            } catch (err) {
+                reject(err);
+            }
+            return;
+        }
+
         if (!db) { reject(new Error('DB not ready')); return; }
 
         const tx = db.transaction([storeName], 'readonly');
@@ -141,6 +338,17 @@ function getAllData(storeName) {
 ------------------------------------------------------- */
 function getDataById(storeName, id) {
     return new Promise((resolve, reject) => {
+        if (isUserLocalStore(storeName)) {
+            try {
+                const record = getLocalStoreData(storeName)
+                    .find(item => Number(item.id) === Number(id)) || null;
+                resolve(record);
+            } catch (err) {
+                reject(err);
+            }
+            return;
+        }
+
         if (!db) { reject(new Error('DB not ready')); return; }
 
         const tx = db.transaction([storeName], 'readonly');
@@ -186,6 +394,30 @@ function getDataByIndex(storeName, indexName, value) {
 ------------------------------------------------------- */
 function updateData(storeName, data) {
     return new Promise((resolve, reject) => {
+        if (isUserLocalStore(storeName)) {
+            try {
+                const email = getSessionUserEmail();
+                if (!email) throw new Error('Please log in first.');
+
+                const records = getLocalStoreData(storeName, email);
+                const index = records.findIndex(item => Number(item.id) === Number(data.id));
+                if (index === -1) throw new Error(`${storeName} record not found.`);
+
+                records[index] = {
+                    ...records[index],
+                    ...data,
+                    userEmail: email,
+                    updatedAt: new Date().toISOString()
+                };
+
+                saveLocalStoreData(storeName, records, email);
+                resolve(records[index].id);
+            } catch (err) {
+                reject(err);
+            }
+            return;
+        }
+
         if (!db) { reject(new Error('DB not ready')); return; }
 
         const tx = db.transaction([storeName], 'readwrite');
@@ -216,6 +448,22 @@ function updateData(storeName, data) {
 ------------------------------------------------------- */
 function deleteData(storeName, id) {
     return new Promise((resolve, reject) => {
+        if (isUserLocalStore(storeName)) {
+            try {
+                const email = getSessionUserEmail();
+                if (!email) throw new Error('Please log in first.');
+
+                const records = getLocalStoreData(storeName, email)
+                    .filter(item => Number(item.id) !== Number(id));
+
+                saveLocalStoreData(storeName, records, email);
+                resolve(true);
+            } catch (err) {
+                reject(err);
+            }
+            return;
+        }
+
         if (!db) { reject(new Error('DB not ready')); return; }
 
         const tx = db.transaction([storeName], 'readwrite');
@@ -238,6 +486,18 @@ function deleteData(storeName, id) {
 ------------------------------------------------------- */
 function clearStore(storeName) {
     return new Promise((resolve, reject) => {
+        if (isUserLocalStore(storeName)) {
+            try {
+                const email = getSessionUserEmail();
+                if (!email) throw new Error('Please log in first.');
+                saveLocalStoreData(storeName, [], email);
+                resolve(true);
+            } catch (err) {
+                reject(err);
+            }
+            return;
+        }
+
         if (!db) { reject(new Error('DB not ready')); return; }
 
         const tx = db.transaction([storeName], 'readwrite');
@@ -280,30 +540,11 @@ async function initDatabase() {
             console.warn('[DB] Could not seed admin user:', e.message);
         }
 
-        // ---- Seed default settings ----
+        // ---- Seed current user's scoped settings when a session exists ----
         try {
-            const allSettings = await getAllData('settings');
-            if (allSettings.length === 0) {
-                await addData('settings', {
-                    businessName: 'Khuwaja Surgical',
-                    address: 'Main Bazar, Sukkur, Sindh, Pakistan',
-                    phone: '0300-1234567',
-                    email: '',
-                    taxRate: 17,
-                    currency: 'PKR',
-                    lowStockLimit: 10,
-                    invoicePrefix: '#',
-                    invoiceStart: 1001,
-                    printWidth: '80mm',
-                    showLogo: true,
-                    showTax: true,
-                    showFooter: true,
-                    footerMsg: 'Thank you for your business! | Khuwaja Surgical'
-                });
-                console.log('[DB] Default settings seeded.');
-            }
+            await ensureCurrentUserScopedData();
         } catch (e) {
-            console.warn('[DB] Could not seed settings:', e.message);
+            console.warn('[DB] Could not seed user-scoped settings:', e.message);
         }
 
         console.log('[DB] initDatabase() complete.');

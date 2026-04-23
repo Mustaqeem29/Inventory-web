@@ -38,7 +38,9 @@ function renderItemsTable(items) {
   updateItemsCount(startIndex + 1, endIndex, totalItems);
   renderPagination(totalPages, items);
 
-  const lowLimit = parseInt(localStorage.getItem('ksLowStockLimit') || '10');
+  const lowLimit = typeof getCurrentLowStockLimit === 'function'
+    ? getCurrentLowStockLimit()
+    : parseInt(localStorage.getItem('ksLowStockLimit') || '10', 10);
 
   tbody.innerHTML = pageItems.map((item, index) => {
     const stockNum = parseInt(item.currentStock) || 0;

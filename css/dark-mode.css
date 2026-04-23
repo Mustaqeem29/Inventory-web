@@ -1,39 +1,87 @@
 /* =====================================================
    css/dark-mode.css
-   Khuwaja Surgical — Dark Mode Overrides
+   Khuwaja Surgical - Dark Mode Overrides
    Apply by toggling this stylesheet or adding
    class="dark" to <html>/<body>
    ===================================================== */
 
-/* Override CSS variables for dark mode */
+/* Override existing variables for dark mode compatibility */
 :root {
   --bg-body: #0f172a;
-  --bg-sidebar: #0d1520;
+  --bg-sidebar: #0a1628;
   --bg-header: #1e293b;
   --bg-card: #1e293b;
   --bg-input: #0f172a;
-  --text-primary: #e2e8f0;
+  --text-primary: #f1f5f9;
   --text-secondary: #94a3b8;
   --text-sidebar: #64748b;
   --border: #334155;
   --border-input: #475569;
-  --shadow-card: 0 1px 4px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.4);
+
+  /* Extra aliases for redesigned components */
+  --accent: #22c55e;
+  --accent-hover: #16a34a;
+  --accent-light: #052e16;
+  --accent-border: #166534;
 }
 
-/* Body base */
+/* Base */
 body {
   background: var(--bg-body);
   color: var(--text-primary);
 }
 
-/* Login page gradient — dark mode */
+/* Global text visibility fixes */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+strong,
+.header-title,
+.page-header h2,
+.form-title,
+.section-title,
+.card-value,
+.meta-value,
+.totals-value {
+  color: #f1f5f9;
+}
+
+p,
+span,
+li,
+td,
+th,
+label,
+small,
+.page-date,
+.form-subtitle,
+.card-label,
+.field-hint,
+.party-label,
+.meta-label,
+.invoice-address,
+.switch-auth,
+.totals-label {
+  color: #cbd5e1;
+}
+
+/* Login page */
 .login-page {
-  background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+  background: linear-gradient(135deg, #020617 0%, #0f172a 60%, #0a1f15 100%);
 }
 
 .login-card {
   background: #1e293b;
   border: 1px solid #334155;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+}
+
+.login-brand h1 {
+  color: #f1f5f9;
 }
 
 .login-brand p {
@@ -41,40 +89,102 @@ body {
 }
 
 /* Auth tabs */
+.auth-tabs {
+  border-bottom-color: #334155;
+}
+
 .tab-btn {
   color: #64748b;
 }
 
 .tab-btn.active {
-  color: #38bdf8;
-  border-bottom-color: #38bdf8;
+  color: #22c55e;
+  border-bottom-color: #22c55e;
+}
+
+.tab-btn:hover {
+  color: #22c55e;
 }
 
 /* Sidebar */
 .sidebar {
-  background: #0d1520;
+  background: #0a1628;
+  border-right-color: #1e293b;
 }
 
 .sidebar-brand {
-  border-bottom-color: rgba(255, 255, 255, 0.06);
+  border-bottom-color: rgba(255, 255, 255, 0.07);
 }
 
 .sidebar-footer {
-  border-top-color: rgba(255, 255, 255, 0.06);
+  border-top-color: rgba(255, 255, 255, 0.07);
 }
 
-/* Top Header */
+.sidebar-brand span:last-child,
+.nav-link:hover,
+.nav-link.active {
+  color: #ffffff;
+}
+
+.nav-link {
+  color: #94a3b8;
+}
+
+.nav-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.nav-link.active {
+  background: #1a3a2e;
+}
+
+/* Header */
 .top-header {
   background: #1e293b;
   border-bottom-color: #334155;
 }
 
+.dark-toggle {
+  border-color: #475569;
+  color: #94a3b8;
+  background: transparent;
+}
+
+.dark-toggle:hover {
+  background: #0f172a;
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+.user-badge {
+  background: #166534;
+  color: #bbf7d0;
+}
+
 /* Cards */
 .summary-card {
   background: #1e293b;
-  border-right-color: #334155;
-  border-top-color: #334155;
-  border-bottom-color: #334155;
+  border-color: #334155;
+}
+
+.summary-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.card-blue .card-icon {
+  background: #0c1a3a;
+}
+
+.card-red .card-icon {
+  background: #2d1515;
+}
+
+.card-green .card-icon {
+  background: #052e16;
+}
+
+.card-purple .card-icon {
+  background: #1e1040;
 }
 
 /* Section blocks */
@@ -87,6 +197,10 @@ body {
   border-bottom-color: #334155;
 }
 
+.section-header-row .section-title {
+  border-bottom: none;
+}
+
 /* Tables */
 .data-table th {
   background: #0f172a;
@@ -95,30 +209,35 @@ body {
 }
 
 .data-table td {
+  color: #cbd5e1;
   border-bottom-color: #334155;
 }
 
 .data-table tbody tr:hover {
-  background: rgba(14, 165, 233, 0.07);
+  background: rgba(255, 255, 255, 0.04);
 }
 
-/* Badges — dark mode tint adjustments */
+/* Badges */
 .badge-green {
-  background: #14532d;
+  background: #052e16;
   color: #86efac;
 }
 
 .badge-red {
-  background: #7f1d1d;
+  background: #2d1515;
   color: #fca5a5;
 }
 
 .badge-yellow {
-  background: #78350f;
+  background: #2d2000;
   color: #fcd34d;
 }
 
-/* Inputs */
+/* Forms & Inputs */
+.form-group label {
+  color: #94a3b8;
+}
+
 .form-group input,
 .form-group select,
 .form-group textarea,
@@ -126,13 +245,14 @@ body {
 .filter-date,
 .discount-input {
   background: #0f172a;
-  color: #e2e8f0;
+  color: #f1f5f9;
   border-color: #475569;
 }
 
 .form-group input::placeholder,
+.form-group textarea::placeholder,
 .search-input::placeholder {
-  color: #64748b;
+  color: #475569;
 }
 
 .form-group input:focus,
@@ -140,47 +260,74 @@ body {
 .form-group textarea:focus,
 .search-input:focus,
 .filter-date:focus {
-  border-color: #38bdf8;
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
 }
 
-/* Input icon wrap on login */
 .input-icon-wrap input {
   background: #0f172a;
-  color: #e2e8f0;
+  color: #f1f5f9;
   border-color: #475569;
+  padding-left: 44px;
 }
 
 .input-icon-wrap input:focus {
-  border-color: #38bdf8;
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+}
+
+.input-icon {
+  color: #64748b;
+  left: 14px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 /* Buttons */
 .btn-outline {
-  color: #e2e8f0;
+  color: #cbd5e1;
   border-color: #475569;
+  background: transparent;
 }
 
 .btn-outline:hover {
   background: #0f172a;
+  border-color: #22c55e;
+  color: #22c55e;
 }
 
-.dark-toggle {
-  border-color: #475569;
+.btn-icon {
   color: #94a3b8;
 }
 
-.dark-toggle:hover {
+.btn-icon:hover {
   background: #0f172a;
-  border-color: #38bdf8;
+  color: #f1f5f9;
 }
 
 /* Quick buttons */
 .quick-btn {
-  filter: brightness(0.9);
+  filter: brightness(0.92);
 }
 
 .quick-btn:hover {
   filter: brightness(1);
+}
+
+.qb-blue {
+  background: #1d4ed8;
+}
+
+.qb-green {
+  background: #16a34a;
+}
+
+.qb-purple {
+  background: #7c3aed;
 }
 
 /* Invoice */
@@ -205,13 +352,56 @@ body {
   border-top-color: #334155;
 }
 
-.grand-total-row td {
+.grand-total-row td,
+.invoice-grand-total-row td {
   background: #0f172a;
   border-color: #334155;
 }
 
 .party-print-row {
   border-bottom-color: #475569;
+}
+
+.invoice-shop-name,
+.invoice-grand-label,
+.invoice-grand-value {
+  color: #22c55e;
+}
+
+.invoice-total-row td,
+.invoice-subtotal-value,
+.invoice-tax-value,
+.invoice-discount-value,
+.totals-table td {
+  color: #f1f5f9;
+}
+
+.invoice-subtotal-label,
+.invoice-tax-label,
+.invoice-discount-label,
+.totals-label {
+  color: #94a3b8;
+}
+
+.invoice-cash-label,
+.invoice-cash-value {
+  color: #60a5fa;
+}
+
+/* Bills / filters */
+.summary-pill {
+  background: #0f172a;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+.summary-pill strong {
+  color: #22c55e;
+}
+
+.filter-bar input,
+.filter-bar select {
+  color: #f1f5f9;
 }
 
 /* Pagination */
@@ -223,69 +413,51 @@ body {
 
 .page-btn:hover,
 .page-btn.active {
-  background: #0ea5e9;
+  background: #22c55e;
   color: #ffffff;
-  border-color: #0ea5e9;
+  border-color: #22c55e;
 }
 
-/* Summary Pills */
-.summary-pill {
-  background: #0f172a;
-  border-color: #334155;
-  color: #94a3b8;
-}
-
-.summary-pill strong {
-  color: #e2e8f0;
-}
-
-/* Page buttons */
-.btn-icon:hover {
-  background: #0f172a;
-}
-
-/* Auth form in dark mode */
+/* Auth helpers */
 .auth-form .form-title {
-  color: #e2e8f0;
+  color: #f1f5f9;
 }
 
 .auth-form .form-subtitle {
-  color: #64748b;
-}
-
-.switch-auth {
   color: #94a3b8;
 }
 
-.switch-auth a {
-  color: #38bdf8;
-}
-
+.switch-auth a,
 .forgot-link {
-  color: #38bdf8;
+  color: #22c55e;
 }
 
-/* Totals table */
-.totals-table td {
-  color: #e2e8f0;
-}
-
-.totals-label {
-  color: #94a3b8;
-}
-
-/* Settings checkbox */
 .checkbox-label {
-  color: #e2e8f0;
+  color: #cbd5e1;
+  font-weight: normal;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
-/* Filter bar */
-.filter-bar input {
-  color: #e2e8f0;
+/* Edit / Delete buttons */
+.btn-edit-item {
+  border-color: #1e40af;
+  color: #60a5fa;
 }
 
-/* Dark toggle icon swap */
-/* Add this class via JS when dark mode is on */
-.dark-mode-on .dark-toggle {
-  content: "☀️";
+.btn-edit-item:hover {
+  background: #1e40af;
+  color: #ffffff;
+  border-color: #1e40af;
+}
+
+.btn-delete-item {
+  border-color: #7f1d1d;
+  color: #fca5a5;
+}
+
+.btn-delete-item:hover {
+  background: #7f1d1d;
+  color: #ffffff;
+  border-color: #7f1d1d;
 }

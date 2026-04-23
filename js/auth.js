@@ -55,6 +55,13 @@ function requireLogin() {
     window.location.href = 'login.html';
     return;
   }
+
+  if (typeof ensureCurrentUserScopedData === 'function') {
+    ensureCurrentUserScopedData().catch(err => {
+      console.warn('[Auth] Could not initialize user-scoped data:', err.message);
+    });
+  }
+
   // Show user name in header badge (if element exists)
   const badge = document.querySelector('.user-badge');
   if (badge) badge.textContent = user.sellerName || 'Admin';
@@ -86,6 +93,9 @@ async function loginUser(email, password) {
 
     // ---- Login success ----
     setCurrentUser(user);
+    if (typeof ensureCurrentUserScopedData === 'function') {
+      await ensureCurrentUserScopedData();
+    }
     console.log('[Auth] Logged in as:', user.email);
 
     // Redirect to dashboard
@@ -137,6 +147,9 @@ async function registerUser(sellerName, email, password) {
 
     // Auto-login after registration
     setCurrentUser(newUser);
+    if (typeof ensureCurrentUserScopedData === 'function') {
+      await ensureCurrentUserScopedData();
+    }
     console.log('[Auth] Registered and logged in:', cleanEmail);
 
     // Redirect to dashboard

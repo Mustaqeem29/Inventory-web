@@ -657,7 +657,9 @@ async function handleShowStock() {
             return;
         }
 
-        const lowLimit = parseInt(localStorage.getItem('ksLowStockLimit') || '10');
+        const lowLimit = typeof getCurrentLowStockLimit === 'function'
+            ? getCurrentLowStockLimit()
+            : parseInt(localStorage.getItem('ksLowStockLimit') || '10', 10);
         const lowItems = allItems.filter(i => (parseInt(i.currentStock) || 0) <= lowLimit);
 
         const lines = allItems.slice(0, 8).map(i => {
