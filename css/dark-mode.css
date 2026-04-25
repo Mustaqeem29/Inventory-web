@@ -264,14 +264,14 @@ small,
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
 }
 
-.input-icon-wrap input {
+.form-group .input-icon-wrap > input {
   background: #0f172a;
   color: #f1f5f9;
   border-color: #475569;
   padding-left: 44px;
 }
 
-.input-icon-wrap input:focus {
+.form-group .input-icon-wrap > input:focus {
   border-color: #22c55e;
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
 }

@@ -16,75 +16,92 @@
       <h1>Khuwaja Surgical</h1>
       <p>Wholesale Medical Store Management</p>
     </div>
+
     <div class="login-card">
       <div class="auth-tabs">
         <button class="tab-btn active" id="login-tab">Login</button>
         <button class="tab-btn" id="register-tab">Register</button>
       </div>
+
       <form class="auth-form" id="login-form" action="#" method="post">
         <h2 class="form-title">Welcome Back</h2>
         <p class="form-subtitle">Sign in to your account</p>
+
         <div class="form-group">
           <label for="login-email">Email Address</label>
           <div class="input-icon-wrap">
-            <span class="input-icon">✉</span>
+            <span class="input-icon">&#9993;</span>
             <input type="email" id="login-email" name="email" placeholder="Enter your email" required>
           </div>
         </div>
+
         <div class="form-group">
           <label for="login-password">Password</label>
           <div class="input-icon-wrap">
-            <span class="input-icon">🔒</span>
+            <span class="input-icon">&#128274;</span>
             <input type="password" id="login-password" name="password" placeholder="Enter your password" required>
           </div>
         </div>
+
         <div class="form-options">
           <label class="checkbox-label"><input type="checkbox" name="remember"> Remember me</label>
           <a href="#" class="forgot-link">Forgot Password?</a>
         </div>
+
         <button type="submit" class="btn btn-primary btn-full">Login to Dashboard</button>
         <p class="switch-auth">Don't have an account? <a href="#" id="go-register">Register here</a></p>
       </form>
+
       <form class="auth-form hidden" id="register-form" action="#" method="post">
         <h2 class="form-title">Create Account</h2>
         <p class="form-subtitle">Register a new user</p>
+
         <div class="form-group">
           <label for="reg-name">Full Name</label>
           <div class="input-icon-wrap">
-            <span class="input-icon">👤</span>
+            <span class="input-icon">&#128100;</span>
             <input type="text" id="reg-name" name="name" placeholder="Your full name" required>
           </div>
         </div>
+
         <div class="form-group">
           <label for="reg-email">Email Address</label>
           <div class="input-icon-wrap">
-            <span class="input-icon">✉</span>
+            <span class="input-icon">&#9993;</span>
             <input type="email" id="reg-email" name="email" placeholder="Your email address" required>
           </div>
         </div>
+
         <div class="form-group">
           <label for="reg-password">Password</label>
           <div class="input-icon-wrap">
-            <span class="input-icon">🔒</span>
+            <span class="input-icon">&#128274;</span>
             <input type="password" id="reg-password" name="password" placeholder="Create a password" required>
           </div>
         </div>
+
         <div class="form-group">
           <label for="reg-confirm">Confirm Password</label>
           <div class="input-icon-wrap">
-            <span class="input-icon">🔒</span>
+            <span class="input-icon">&#128274;</span>
             <input type="password" id="reg-confirm" name="confirm" placeholder="Confirm your password" required>
           </div>
         </div>
+
         <button type="submit" class="btn btn-primary btn-full">Create Account</button>
         <p class="switch-auth">Already have an account? <a href="#" id="go-login">Login here</a></p>
       </form>
     </div>
   </div>
+
   <script src="js/db.js"></script>
   <script src="js/helpers.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/auth.js"></script>
-  <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js');</script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
 </body>
 </html>

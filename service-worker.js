@@ -30,7 +30,7 @@
                  delete the old cache automatically.
    FILES       : Every file the app needs to run offline.
 ----------------------------------------------------- */
-const CACHE_NAME = 'khuwaja-surgical-cache-v5';
+const CACHE_NAME = 'khuwaja-surgical-cache-v6';
 
 const FILES_TO_CACHE = [
 
