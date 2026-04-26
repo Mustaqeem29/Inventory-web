@@ -41,7 +41,7 @@ window.addEventListener('dbReady', async function () {
 
         // Low Stock Items count
         const lowItems = items.filter(it =>
-            (parseInt(it.stock) || 0) <= lowLimit
+            (parseInt(it.currentStock) || 0) <= lowLimit
         );
         const lowEl = document.getElementById('card-low-stock');
         if (lowEl) lowEl.textContent = lowItems.length;
@@ -120,11 +120,11 @@ window.addEventListener('dbReady', async function () {
             } else {
                 // Sort: most critical (lowest stock) first
                 const sorted = [...lowItems].sort((a, b) =>
-                    (parseInt(a.stock) || 0) - (parseInt(b.stock) || 0)
+                    (parseInt(a.currentStock) || 0) - (parseInt(b.currentStock) || 0)
                 );
 
                 sorted.forEach(item => {
-                    const stock = parseInt(item.stock) || 0;
+                    const stock = parseInt(item.currentStock) || 0;
                     const badgeClass = stock <= 5 ? 'badge-red' : 'badge-yellow';
                     const unit = item.unit || 'pcs';
 

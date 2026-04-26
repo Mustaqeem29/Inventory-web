@@ -13,6 +13,10 @@
 let allBills = [];
 let billsSettings = {};
 
+function getBillsCurrency() {
+    return billsSettings.currency || 'PKR';
+}
+
 /* =======================================================
    LOAD BILLS
    ======================================================= */
@@ -81,7 +85,7 @@ function renderBillsTable(bills) {
       <td>${escHtmlBl(bill.sellerName || '---')}</td>
       <td>${formatDate(bill.date)}</td>
       <td>${(bill.items || []).length}</td>
-      <td><strong>${formatCurrency(bill.grandTotal)}</strong></td>
+      <td><strong>${formatCurrency(bill.grandTotal, getBillsCurrency())}</strong></td>
       <td class="action-btns">
         <button class="btn btn-sm btn-outline"
           onclick="viewBillDetails(${bill.id})"
@@ -108,7 +112,7 @@ function updateBillsSummary(bills) {
     const countEl = document.getElementById('summary-count');
     const revenueEl = document.getElementById('summary-revenue');
     if (countEl) countEl.textContent = totalBills;
-    if (revenueEl) revenueEl.textContent = formatCurrency(totalRevenue);
+    if (revenueEl) revenueEl.textContent = formatCurrency(totalRevenue, getBillsCurrency());
 }
 
 /* =======================================================
@@ -298,39 +302,39 @@ async function viewBillDetails(id) {
                 <td style="padding:7px 12px;color:#64748b;font-weight:600;
                   text-align:right;width:60%;">Subtotal:</td>
                 <td style="padding:7px 12px;text-align:right;color:#1e293b;font-weight:500;">
-                  ${formatCurrency(bill.subtotal)}</td>
+                  ${formatCurrency(bill.subtotal, getBillsCurrency())}</td>
               </tr>
               <tr>
                 <td style="padding:7px 12px;color:#64748b;font-weight:600;
                   text-align:right;">Tax (${bill.taxRate || 17}%):</td>
                 <td style="padding:7px 12px;text-align:right;color:#1e293b;font-weight:500;">
-                  ${formatCurrency(bill.taxAmount)}</td>
+                  ${formatCurrency(bill.taxAmount, getBillsCurrency())}</td>
               </tr>
               <tr>
                 <td style="padding:7px 12px;color:#64748b;font-weight:600;
                   text-align:right;">Discount:</td>
                 <td style="padding:7px 12px;text-align:right;color:#1e293b;font-weight:500;">
-                  ${formatCurrency(bill.discount)}</td>
+                  ${formatCurrency(bill.discount, getBillsCurrency())}</td>
               </tr>
               <tr style="background:#f0fdf4;border-radius:6px;">
                 <td style="padding:10px 12px;font-size:15px;font-weight:800;
                   text-align:right;color:#0f172a;">Grand Total:</td>
                 <td style="padding:10px 12px;font-size:15px;font-weight:800;
                   text-align:right;color:#16a34a;">
-                  ${formatCurrency(bill.grandTotal)}</td>
+                  ${formatCurrency(bill.grandTotal, getBillsCurrency())}</td>
               </tr>
               <tr>
                 <td style="padding:7px 12px;color:#64748b;font-weight:600;
                   text-align:right;">Cash Received:</td>
                 <td style="padding:7px 12px;text-align:right;color:#1e293b;font-weight:500;">
-                  ${formatCurrency(bill.cashPaid)}</td>
+                  ${formatCurrency(bill.cashPaid, getBillsCurrency())}</td>
               </tr>
               <tr>
                 <td style="padding:7px 12px;color:#64748b;font-weight:600;
                   text-align:right;">Balance:</td>
                 <td style="padding:7px 12px;text-align:right;font-weight:600;
                   color:${bill.balance < 0 ? '#dc2626' : '#16a34a'}">
-                  ${formatCurrency(bill.balance)}</td>
+                  ${formatCurrency(bill.balance, getBillsCurrency())}</td>
               </tr>
             </table>
 
