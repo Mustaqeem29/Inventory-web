@@ -7,6 +7,49 @@ let currentBillItems = [];
 let billSettings = {};
 let nextInvoiceNum = 1001;
 
+function getCurrencySymbol(currency = 'PKR') {
+  const symbols = { PKR: 'Rs.', USD: '$' };
+  return symbols[currency] || currency;
+}
+
+function applyBillingCurrencyLabels() {
+  const symbol = getCurrencySymbol(billSettings.currency || 'PKR');
+  document.querySelectorAll('[data-currency-label]').forEach(el => {
+    el.textContent = symbol;
+  });
+}
+
+function applyBillingPrintSettings() {
+  const footerMsgEl = document.getElementById('print-footer-msg');
+  const footerShopEl = document.getElementById('print-footer-shop');
+  const footerWrapEl = document.querySelector('.invoice-footer');
+  const shopNameEl = document.getElementById('invoice-shop-name');
+  const printArea = document.getElementById('invoice-print-area');
+
+  if (footerMsgEl) {
+    footerMsgEl.textContent = billSettings.footerMsg || 'Thank you for your business!';
+  }
+
+  if (footerShopEl) {
+    footerShopEl.textContent = billSettings.businessName || 'Khuwaja Surgical';
+    footerShopEl.style.display = billSettings.showLogo === false ? 'none' : '';
+  }
+
+  if (footerWrapEl) {
+    footerWrapEl.style.display = billSettings.showFooter === false ? 'none' : '';
+  }
+
+  if (shopNameEl) {
+    shopNameEl.textContent = billSettings.showLogo === false
+      ? ''
+      : (billSettings.businessName || 'Khuwaja Surgical');
+  }
+
+  if (printArea) {
+    printArea.dataset.printWidth = billSettings.printWidth || '80mm';
+  }
+}
+
 /* =======================================================
    LOAD SETTINGS & INVENTORY DROPDOWN
    ======================================================= */
@@ -35,6 +78,16 @@ async function loadBillSettings() {
     const addrEl = document.getElementById('invoice-address');
     if (addrEl) addrEl.textContent =
       (billSettings.address || '') + ' | Ph: ' + (billSettings.phone || '');
+
+    if (shopEl && billSettings.showLogo === false) {
+      shopEl.textContent = '';
+    }
+
+    const taxLabel = document.querySelector('.invoice-tax-label');
+    if (taxLabel) taxLabel.textContent = `Tax (${billSettings.taxRate || 17}%):`;
+
+    applyBillingCurrencyLabels();
+    applyBillingPrintSettings();
 
   } catch (err) {
     console.error('[Billing] loadBillSettings error:', err);
@@ -488,7 +541,7 @@ function buildBillingPage() {
           <input type="number" id="item-qty" value="1" min="1" autocomplete="off">
         </div>
         <div class="form-group" style="min-width:110px;">
-          <label for="item-rate">Rate (Rs.)</label>
+          <label for="item-rate">Rate (<span data-currency-label>Rs.</span>)</label>
           <input type="number" id="item-rate" placeholder="0.00"
             step="0.01" autocomplete="off">
         </div>
@@ -528,12 +581,12 @@ function buildBillingPage() {
     <div class="invoice-totals">
       <div class="totals-left no-print">
         <div class="form-group">
-          <label for="discount">Discount (Rs.)</label>
+          <label for="discount">Discount (<span data-currency-label>Rs.</span>)</label>
           <input type="number" id="discount" placeholder="0.00"
             step="0.01" min="0" oninput="recalculateTotals()" autocomplete="off">
         </div>
         <div class="form-group">
-          <label for="cash-received">Cash Received (Rs.)</label>
+          <label for="cash-received">Cash Received (<span data-currency-label>Rs.</span>)</label>
           <input type="number" id="cash-received" placeholder="0.00"
             step="0.01" min="0" oninput="recalculateTotals()" autocomplete="off">
         </div>
@@ -542,30 +595,30 @@ function buildBillingPage() {
         <table class="totals-table">
           <tr>
             <td class="totals-label">Subtotal:</td>
-            <td class="totals-value">Rs. <span id="total-subtotal">0.00</span></td>
+            <td class="totals-value"><span data-currency-label>Rs.</span> <span id="total-subtotal">0.00</span></td>
           </tr>
           <tr>
-            <td class="totals-label">Tax (${billSettings.taxRate || 17}%):</td>
-            <td class="totals-value">Rs. <span id="total-tax">0.00</span></td>
+            <td class="totals-label invoice-tax-label">Tax (${billSettings.taxRate || 17}%):</td>
+            <td class="totals-value"><span data-currency-label>Rs.</span> <span id="total-tax">0.00</span></td>
           </tr>
           <tr>
             <td class="totals-label">Discount:</td>
-            <td class="totals-value">Rs. <span id="total-discount">0.00</span></td>
+            <td class="totals-value"><span data-currency-label>Rs.</span> <span id="total-discount">0.00</span></td>
           </tr>
           <tr class="grand-total-row">
             <td class="totals-label">Grand Total:</td>
             <td class="totals-value grand-total-val">
-              Rs. <span id="total-grand">0.00</span>
+              <span data-currency-label>Rs.</span> <span id="total-grand">0.00</span>
             </td>
           </tr>
           <tr>
             <td class="totals-label">Cash Received:</td>
-            <td class="totals-value">Rs. <span id="total-cash">0.00</span></td>
+            <td class="totals-value"><span data-currency-label>Rs.</span> <span id="total-cash">0.00</span></td>
           </tr>
           <tr>
             <td class="totals-label">Balance:</td>
             <td class="totals-value balance-val">
-              Rs. <span id="total-balance">0.00</span>
+              <span data-currency-label>Rs.</span> <span id="total-balance">0.00</span>
             </td>
           </tr>
         </table>
