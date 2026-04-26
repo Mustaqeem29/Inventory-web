@@ -98,6 +98,8 @@ function createPrintableInvoiceHTML(billData, settings = {}) {
     const bizPhone = escapeHtml(settings.phone || '');
     const footerMsg = escapeHtml(settings.footerMsg || 'Thank you for your business!');
     const currency = settings.currency || 'PKR';
+    const printWidth = settings.printWidth || '80mm';
+    const showLogo = settings.showLogo !== false;
     const showTax = settings.showTax !== false;
     const showFooter = settings.showFooter !== false;
 
@@ -143,7 +145,7 @@ function createPrintableInvoiceHTML(billData, settings = {}) {
   <style>
     /* ===== RECEIPT PRINT STYLES ===== */
     @page {
-      size: 80mm auto;   /* POS receipt width */
+      size: ${printWidth} auto;
       margin: 4mm 3mm;
     }
 
@@ -161,7 +163,7 @@ function createPrintableInvoiceHTML(billData, settings = {}) {
       line-height: 1.45;
       color: #000;
       background: #fff;
-      width: 80mm;
+      width: ${printWidth};
     }
 
     /* ---- Header ---- */
@@ -176,6 +178,7 @@ function createPrintableInvoiceHTML(billData, settings = {}) {
       font-weight: 900;
       letter-spacing: 0.5px;
       margin-bottom: 3px;
+      display: ${showLogo ? 'block' : 'none'};
     }
     .shop-address, .shop-phone {
       font-size: 10px;
@@ -273,7 +276,11 @@ function createPrintableInvoiceHTML(billData, settings = {}) {
       color: #444;
     }
     .footer-msg { margin-bottom: 2px; }
-    .footer-shop { font-weight: bold; font-size: 11px; }
+    .footer-shop {
+      font-weight: bold;
+      font-size: 11px;
+      display: ${showLogo ? 'block' : 'none'};
+    }
   </style>
 </head>
 <body>
