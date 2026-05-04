@@ -1,4 +1,4 @@
-🏥 Khuwaja Surgical — Inventory Management System
+🏥 Inventory Management System
 
 A complete offline-capable inventory management web app built for a wholesale medical store.
 
