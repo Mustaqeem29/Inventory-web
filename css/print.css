@@ -1,0 +1,256 @@
+/* =====================================================
+   css/print.css
+   Khuwaja Surgical — Print / Receipt Styles
+   Applied via: <link rel="stylesheet" href="css/print.css" media="print">
+   Or inside: @media print { ... }
+   ===================================================== */
+
+@media print {
+
+  /* ---- 1. PAGE SETUP ---- */
+  @page {
+    /* Narrow receipt format — change to A4 for full-page */
+    size: 80mm auto;
+    margin: 6mm 4mm;
+  }
+
+  /* ---- 2. RESET FOR PRINT ---- */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    color-adjust: exact;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 11px;
+    line-height: 1.4;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* ---- 3. HIDE NON-PRINT ELEMENTS ---- */
+  /* Sidebar, header, buttons, forms — all hidden when printing */
+  .no-print,
+  .sidebar,
+  .top-header,
+  .menu-toggle,
+  .dark-toggle,
+  .user-badge,
+  .invoice-parties,
+  /* screen party info form */
+  .add-item-row,
+  /* add item form row */
+  .totals-left,
+  /* cash received input */
+  .invoice-actions,
+  /* print/save/clear buttons */
+  .discount-input,
+  /* discount input box */
+  .btn,
+  .btn-icon,
+  .pagination,
+  .filter-bar,
+  .section-block,
+  .quick-actions,
+  .cards-grid,
+  .page-header {
+    display: none !important;
+  }
+
+  /* ---- 4. SHOW PRINT-ONLY ELEMENTS ---- */
+  .print-only {
+    display: block !important;
+  }
+
+  /* ---- 5. LAYOUT — FULL WIDTH ---- */
+  .main-wrapper {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+
+  .page-content {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* ---- 6. INVOICE WRAPPER ---- */
+  .invoice-wrapper {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    background: #ffffff !important;
+  }
+
+  /* ---- 7. RECEIPT HEADER ---- */
+  .invoice-header {
+    text-align: center !important;
+    border-bottom: 2px dashed #000 !important;
+    padding-bottom: 6px !important;
+    margin-bottom: 6px !important;
+    display: block !important;
+  }
+
+  .invoice-brand {
+    text-align: center !important;
+  }
+
+  .invoice-shop-name {
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    color: #000 !important;
+    letter-spacing: 0.5px;
+    text-align: center;
+    display: block;
+  }
+
+  .invoice-address {
+    font-size: 10px !important;
+    color: #333 !important;
+    text-align: center;
+  }
+
+  .invoice-meta {
+    text-align: center !important;
+    margin-top: 6px;
+  }
+
+  .meta-row {
+    justify-content: center !important;
+    font-size: 11px !important;
+  }
+
+  .meta-label {
+    color: #000 !important;
+  }
+
+  .meta-value {
+    color: #000 !important;
+  }
+
+  /* ---- 8. PARTY INFO (PRINT-ONLY ROW) ---- */
+  .party-print-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    font-size: 10px !important;
+    margin: 6px 0 !important;
+    padding-bottom: 6px !important;
+    border-bottom: 1px dashed #999 !important;
+  }
+
+  /* ---- 9. ITEMS TABLE ---- */
+  .invoice-items {
+    margin: 4px 0 !important;
+  }
+
+  .invoice-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 10px !important;
+  }
+
+  .invoice-table th {
+    background: #000 !important;
+    color: #fff !important;
+    padding: 4px 5px !important;
+    text-align: left !important;
+    font-size: 10px !important;
+    font-weight: bold;
+  }
+
+  .invoice-table td {
+    padding: 3px 5px !important;
+    border-bottom: 1px dotted #ccc !important;
+    color: #000 !important;
+    font-size: 10px !important;
+  }
+
+  .invoice-table tbody tr:hover {
+    background: transparent !important;
+  }
+
+  /* ---- 10. TOTALS SECTION ---- */
+  .invoice-totals {
+    display: block !important;
+    border-top: 2px dashed #000 !important;
+    padding-top: 6px !important;
+    margin-top: 6px !important;
+  }
+
+  .totals-right {
+    width: 100% !important;
+    min-width: unset !important;
+  }
+
+  .totals-table {
+    width: 100% !important;
+    font-size: 11px !important;
+  }
+
+  .totals-table td {
+    padding: 3px 4px !important;
+    color: #000 !important;
+  }
+
+  .totals-label {
+    text-align: left !important;
+    color: #333 !important;
+    font-weight: bold;
+  }
+
+  .totals-value {
+    text-align: right !important;
+    color: #000 !important;
+  }
+
+  .grand-total-row td {
+    background: #f0f0f0 !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    border-top: 1.5px solid #000 !important;
+    border-bottom: 1.5px solid #000 !important;
+    padding: 5px 4px !important;
+    color: #000 !important;
+  }
+
+  .grand-total-val {
+    color: #000 !important;
+  }
+
+  .balance-val {
+    color: #000 !important;
+  }
+
+  /* ---- 11. RECEIPT FOOTER ---- */
+  .invoice-footer {
+    display: block !important;
+    text-align: center !important;
+    margin-top: 10px !important;
+    padding-top: 8px !important;
+    border-top: 2px dashed #000 !important;
+    font-size: 10px !important;
+    color: #444 !important;
+  }
+
+  .invoice-footer p {
+    margin-bottom: 2px;
+  }
+
+  /* ---- 12. BADGES ---- */
+  .badge {
+    background: none !important;
+    color: #000 !important;
+    font-weight: bold;
+    padding: 0 !important;
+  }
+
+  /* ---- 13. NO PAGE BREAK INSIDE ROWS ---- */
+  tr {
+    page-break-inside: avoid;
+  }
+
+}

@@ -1,0 +1,9 @@
+# Sensitive Information
+js/config.js
+
+# Temporary Files
+scratch/
+.vscode/
+node_modules/
+.DS_Store
+Thumbs.db

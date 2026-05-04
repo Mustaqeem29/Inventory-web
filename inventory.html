@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory - Khuwaja Surgical</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/dark-mode.css" id="dark-mode-css" disabled>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon-sm"><svg width="18" height="18" fill="none" stroke="#4ade80" stroke-width="2" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div>
+      <span>Khuwaja Surgical</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="nav-link"><span class="nav-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Dashboard</a>
+      <a href="inventory.html" class="nav-link active"><span class="nav-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span>Inventory</a>
+      <a href="billing.html" class="nav-link"><span class="nav-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>New Bill</a>
+      <a href="bills.html" class="nav-link"><span class="nav-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>Bills</a>
+      <a href="settings.html" class="nav-link"><span class="nav-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg></span>Settings</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="login.html" class="nav-link logout-link"><span class="nav-icon"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>Logout</a>
+    </div>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="top-header">
+      <button class="menu-toggle" id="menu-toggle">☰</button>
+      <div class="header-title">Inventory Management</div>
+      <div class="header-right">
+        <button class="dark-toggle" id="dark-toggle" title="Toggle Dark Mode">🌙</button>
+        <div class="user-badge">Admin</div>
+      </div>
+    </header>
+    <main class="page-content">
+      <div class="page-header">
+        <h2>Inventory</h2>
+        <p class="page-date">Manage your medical stock</p>
+      </div>
+
+      <div class="section-block">
+        <h3 class="section-title">Add New Item</h3>
+        <form class="item-form" action="#" method="post">
+          <div class="form-row">
+            <div class="form-group"><label for="item-code">Item Code</label><input type="text" id="item-code" name="item_code" placeholder="e.g. SRG-001" required></div>
+            <div class="form-group"><label for="item-name">Item Name</label><input type="text" id="item-name" name="item_name" placeholder="e.g. Surgical Gloves" required></div>
+            <div class="form-group"><label for="category">Category</label>
+              <select id="category" name="category" required>
+                <option value="">-- Select Category --</option>
+                <option>PPE</option><option>Syringes</option><option>Dressings</option>
+                <option>Instruments</option><option>Consumables</option><option>Medicines</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label for="buying-rate">Buying Rate (Rs.)</label><input type="number" id="buying-rate" name="buying_rate" placeholder="0.00" step="0.01" min="0" required></div>
+            <div class="form-group"><label for="selling-rate">Selling Rate (Rs.)</label><input type="number" id="selling-rate" name="selling_rate" placeholder="0.00" step="0.01" min="0" required></div>
+            <div class="form-group"><label for="stock">Stock Quantity</label><input type="number" id="stock" name="stock" placeholder="0" min="0" required></div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">+ Add Item</button>
+            <button type="reset" class="btn btn-outline">Reset</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="section-block">
+        <div class="section-header-row">
+          <h3 class="section-title">All Inventory Items</h3>
+          <div class="search-bar"><input type="text" placeholder="Search items..." class="search-input"></div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>#</th><th>Item Code</th><th>Item Name</th><th>Category</th><th>Buying Rate</th><th>Selling Rate</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>SRG-001</td><td>Surgical Gloves (M)</td><td>PPE</td><td>Rs. 350</td><td>Rs. 500</td><td>3</td><td><span class="badge badge-red">Low</span></td><td class="action-btns"><button class="btn-edit-item">Edit</button><button class="btn-delete-item">Delete</button></td></tr>
+              <tr><td>2</td><td>SRG-045</td><td>Disposable Syringe 5ml</td><td>Syringes</td><td>Rs. 12</td><td>Rs. 20</td><td>8</td><td><span class="badge badge-red">Low</span></td><td class="action-btns"><button class="btn-edit-item">Edit</button><button class="btn-delete-item">Delete</button></td></tr>
+              <tr><td>3</td><td>SRG-102</td><td>Cotton Bandage 4"</td><td>Dressings</td><td>Rs. 45</td><td>Rs. 70</td><td>150</td><td><span class="badge badge-green">OK</span></td><td class="action-btns"><button class="btn-edit-item">Edit</button><button class="btn-delete-item">Delete</button></td></tr>
+              <tr><td>4</td><td>SRG-200</td><td>Stethoscope (Standard)</td><td>Instruments</td><td>Rs. 800</td><td>Rs. 1,200</td><td>22</td><td><span class="badge badge-green">OK</span></td><td class="action-btns"><button class="btn-edit-item">Edit</button><button class="btn-delete-item">Delete</button></td></tr>
+              <tr><td>5</td><td>SRG-311</td><td>Oxygen Mask (Adult)</td><td>Consumables</td><td>Rs. 95</td><td>Rs. 150</td><td>15</td><td><span class="badge badge-yellow">Mid</span></td><td class="action-btns"><button class="btn-edit-item">Edit</button><button class="btn-delete-item">Delete</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">Next</button>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="js/db.js"></script><script src="js/helpers.js"></script><script src="js/ui.js"></script>
+  <script src="js/auth.js"></script><script src="js/inventory.js"></script><script src="js/backup.js"></script>
+  <script src="js/config.js"></script><script src="js/chatbot.js"></script>
+  <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('service-worker.js');</script>
+</body>
+</html>
