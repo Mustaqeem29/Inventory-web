@@ -1,71 +1,46 @@
-🏥 Khuwaja Surgical — Inventory Management System
+# 📦 Khuwaja Surgical — Inventory Management System
 
-A complete offline-capable inventory management web app built for a wholesale medical store.
+A modern, redesigned web-based inventory management system tailored for Khuwaja Surgical. This application features a robust local database, real-time analytics, a professional billing system, and an integrated **Gemini AI Chatbot**.
 
-🔗 Live Demo: [khuwaja-surgical.github.io/Inventory-web/login.html](https://Mustaqeem29.github.io/Inventory-web/login.html)
+## 🚀 Key Features
 
---------------------------------------------------------------------------------------------------------------------------------------
+*   **📊 Dynamic Dashboard**: View real-time stock levels, recent bills, and critical low-stock alerts at a glance.
+*   **🤖 AI Inventory Assistant**: Powered by **Google Gemini AI**. Ask the chatbot about stock levels, logical deductions, or inventory advice in English or Roman Urdu.
+*   **🧾 Professional Billing**: Generate, manage, and print professional bills directly from the browser.
+*   **📦 Inventory Control**: Full CRUD support for products with categories, suppliers, and quantity tracking.
+*   **🌙 Dark Mode**: Sleek, modern interface with a premium dark mode toggle.
+*   **📴 Offline Ready**: Uses **IndexedDB** for local storage, allowing you to manage your business even without an internet connection.
+*   **📱 Responsive Design**: Fully optimized for desktops, tablets, and mobile devices.
 
-✨ Features
+## 🛠️ Tech Stack
 
-- 🔐 **Login System** — Secure access to the app
-- 📦 **Inventory Management** — Add, update, and track medical products
-- 🧾 **Billing Module** — Generate bills for customers
-- 📊 **Dashboard** — Overview of stock and sales at a glance
-- 🤖 **Chatbot** — Built-in assistant for quick help
-- ⚙️ **Settings Page** — Customize app preferences
-- 📴 **Offline Support** — Works without internet (PWA with Service Worker)
-- 💾 **Local Storage** — All data saved in browser using IndexedDB (no server needed)
+*   **Frontend**: HTML5, Vanilla JavaScript, CSS3
+*   **Database**: IndexedDB (Browser-native local storage)
+*   **AI Engine**: Google Gemini API (2.0 Flash)
+*   **Styling**: Modern CSS with Glassmorphism and smooth animations.
 
------------------------------------------------------------------------------------------
+## ⚙️ Setup & Installation
 
-🛠️ Tech Stack
+1.  **Clone the Repository**:
+    ```bash
+    git clone https://github.com/Mustaqeem29/Inventory-web.git
+    ```
 
-| Technology | Usage |
-|---|---|
-| HTML5 | Structure & layout |
-| CSS3 | Styling & responsive design |
-| Vanilla JavaScript | Logic & interactivity |
-| IndexedDB | Local database (offline storage) |
-| Service Worker | PWA & offline caching |
-| GitHub Pages | Free hosting & deployment |
+2.  **Configure API Key**:
+    The AI Chatbot requires a Gemini API Key. For security, create a file at `js/config.js` and add your key:
+    ```javascript
+    const CONFIG = {
+        GEMINI_API_KEY: "YOUR_API_KEY_HERE"
+    };
+    ```
 
------------------------------------------------------------------------------------------
+3.  **Run the App**:
+    Simply open `index.html` in any modern web browser. No server required!
 
-📸 Screenshots
+## 🔒 Security Note
 
-> *(Add screenshots of Login, Dashboard, Billing, and Inventory pages here)*
+The `js/config.js` file is included in `.gitignore` to prevent your private API keys from being leaked to GitHub. Always keep your keys secret!
 
-------------------------------------------------------------------------------------------
-🚀 How to Use
+## 📄 License
 
-1. Open the [live link](https://Mustaqeem29.github.io/Inventory-web/login.html) in your browser
-2. Log in with your credentials
-3. Manage inventory, generate bills, and view dashboard — all offline!
-
-------------------------------------------------------------------------------------------
-📁 Project Structure
-
-Inventory-web/
-├── login.html
-├── dashboard.html
-├── inventory.html
-├── billing.html
-├── chatbot.html
-├── settings.html
-├── css/
-├── js/
-└── service-worker.js
-
------------------------------------------------------------------------------------------
-
-👨‍💻 Developer
-
-**Mustaqeem** — CS Student @ DUET  
-Built as a real-world project to learn HTML, CSS, JS & IndexedDB.
-
-----------------------------------------------------------------------------------------
-
-📄 License
-
-This project is open source and free to use.
+This project is developed for Khuwaja Surgical. All rights reserved.
